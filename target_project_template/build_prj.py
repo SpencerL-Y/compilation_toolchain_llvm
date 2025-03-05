@@ -13,16 +13,27 @@ INCLUDE_DIR = os.path.join(PROJECT_DIR, 'includes')
 os.makedirs(BUILD_DIR, exist_ok=True)
 
 # 找到所有的源文件（.c 文件）
-source_files = glob.glob(os.path.join(SOURCE_DIR, "*.c"))
+source_files = glob.glob(os.path.join(SOURCE_DIR, "**", "*.c"), recursive=True)
 
 # 编译每个源文件为 LLVM 中间表示（.ll 文件）
 def compile_to_ll(source_file):
-    source_name = os.path.basename(source_file)
-    ll_file = os.path.join(BUILD_DIR, f"{source_name}.ll")
+    # 获取源文件的相对路径（相对于 SOURCE_DIR）
+    relative_path = os.path.relpath(source_file, SOURCE_DIR)
     
+    # 获取文件名（没有扩展名）
+    source_name = os.path.splitext(os.path.basename(source_file))[0]
+    
+    # 构建在 BUILD_DIR 中的目标文件路径
+    # old source compiling does not consider folders
+    # source_name = os.path.basename(source_file)
+    # ll_file = os.path.join(BUILD_DIR, f"{source_name}.ll")
+    ll_file = os.path.join(BUILD_DIR, os.path.dirname(relative_path), f"{source_name}.ll")
+    os.makedirs(os.path.dirname(ll_file), exist_ok=True)
+
+
     # clang 命令行编译源文件为 .ll 文件，加入包含路径
     clang_command = [
-        "clang", "-emit-llvm", "-O0", "-g" ,"-I", INCLUDE_DIR, "-S", source_file, "-o", ll_file
+        "clang",  "-emit-llvm", "-O0", "-g3", "-I", INCLUDE_DIR, "-S", source_file, "-o", ll_file
     ]
     print(f"Running command: {' '.join(clang_command)}")
     subprocess.run(clang_command, check=True)
@@ -70,5 +81,15 @@ def build():
     # 步骤3：链接生成可执行文件
     link_to_executable(passed_ll_files)
 
+def build_ll():
+    print("Building ll files... ")
+    ll_files = []
+    for source_file in source_files:
+        print("compiling source file: " + source_file)
+        ll_file = compile_to_ll(source_file)
+        ll_files.append(ll_file)
+    
+
 if __name__ == "__main__":
-    build()
+    # build()
+    build_ll()

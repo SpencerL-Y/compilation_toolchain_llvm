@@ -1,4 +1,4 @@
-; ModuleID = '../../target_project_template/build/test.ll'
+; ModuleID = '/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/test.c'
 source_filename = "/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/test.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
@@ -8,12 +8,6 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str = private unnamed_addr constant [71 x i8] c"[OBJ ALLOC] malloc result: %p, in file: %s, at line: %d, variable: %s\0A\00", align 1, !dbg !0
 @.str.1 = private unnamed_addr constant [78 x i8] c"[OBJ FREE] free result: %p freed, in file %s, at line %d, variable freed: %s\0A\00", align 1, !dbg !7
 @.str.2 = private unnamed_addr constant [72 x i8] c"[AFTER FREE] freed ptr: %p, in file %s, at line %d, variable freed: %s\0A\00", align 1, !dbg !12
-@0 = private unnamed_addr constant [11 x i8] c"src/test.c\00", align 1
-@1 = private unnamed_addr constant [1 x i8] zeroinitializer, align 1
-@2 = private unnamed_addr constant [11 x i8] c"src/test.c\00", align 1
-@3 = private unnamed_addr constant [11 x i8] c"src/test.c\00", align 1
-@4 = private unnamed_addr constant [1 x i8] zeroinitializer, align 1
-@5 = private unnamed_addr constant [11 x i8] c"src/test.c\00", align 1
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main() #0 !dbg !28 {
@@ -26,12 +20,10 @@ define dso_local i32 @main() #0 !dbg !28 {
     #dbg_declare(ptr %3, !39, !DIExpression(), !40)
   store ptr null, ptr %3, align 8, !dbg !40
   %4 = call noalias ptr @malloc(i64 noundef 8) #4, !dbg !41
-  call void @clexma_log_malloc_result(ptr %4, ptr @0, i32 11, ptr @1), !dbg !42
   store ptr %4, ptr %3, align 8, !dbg !42
   %5 = load ptr, ptr %3, align 8, !dbg !43
   call void @free(ptr noundef %5) #5, !dbg !44
   %6 = call noalias ptr @malloc(i64 noundef 8) #4, !dbg !45
-  call void @clexma_log_malloc_result(ptr %6, ptr @3, i32 13, ptr @4), !dbg !46
   store ptr %6, ptr %2, align 8, !dbg !46
   %7 = load ptr, ptr %2, align 8, !dbg !47
   %8 = load ptr, ptr %3, align 8, !dbg !49
