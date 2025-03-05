@@ -16,9 +16,7 @@ define dso_local i32 @main() #0 !dbg !28 {
   %3 = alloca ptr, align 8
   store i32 0, ptr %1, align 4
     #dbg_declare(ptr %2, !33, !DIExpression(), !38)
-  store ptr null, ptr %2, align 8, !dbg !38
     #dbg_declare(ptr %3, !39, !DIExpression(), !40)
-  store ptr null, ptr %3, align 8, !dbg !40
   %4 = call noalias ptr @malloc(i64 noundef 8) #4, !dbg !41
   store ptr %4, ptr %3, align 8, !dbg !42
   %5 = load ptr, ptr %3, align 8, !dbg !43
@@ -127,7 +125,7 @@ attributes #5 = { nounwind }
 
 !0 = !DIGlobalVariableExpression(var: !1, expr: !DIExpression())
 !1 = distinct !DIGlobalVariable(scope: null, file: !2, line: 23, type: !3, isLocal: true, isDefinition: true)
-!2 = !DIFile(filename: "src/test.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "1645b73660ba0cae737e5bbdf0bf21ac")
+!2 = !DIFile(filename: "src/test.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "2f743c9dc439f7a76bb9f61a98bb4b98")
 !3 = !DICompositeType(tag: DW_TAG_array_type, baseType: !4, size: 568, elements: !5)
 !4 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_signed_char)
 !5 = !{!6}
@@ -143,7 +141,7 @@ attributes #5 = { nounwind }
 !15 = !{!16}
 !16 = !DISubrange(count: 72)
 !17 = distinct !DICompileUnit(language: DW_LANG_C11, file: !18, producer: "clang version 21.0.0git", isOptimized: false, runtimeVersion: 0, emissionKind: FullDebug, globals: !19, splitDebugInlining: false, nameTableKind: None)
-!18 = !DIFile(filename: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/test.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "1645b73660ba0cae737e5bbdf0bf21ac")
+!18 = !DIFile(filename: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/test.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "2f743c9dc439f7a76bb9f61a98bb4b98")
 !19 = !{!0, !7, !12}
 !20 = !{i32 7, !"Dwarf Version", i32 5}
 !21 = !{i32 2, !"Debug Info Version", i32 3}

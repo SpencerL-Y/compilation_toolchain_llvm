@@ -6,8 +6,8 @@ int main() {
     struct T {
         struct T* next;
     };
-    struct T* x = ((void *)0);
-    struct T* y = ((void *)0);
+    struct T* x;
+    struct T* y;
     y = malloc(sizeof(*y));
     free(y);
     x = malloc(sizeof(*x));
