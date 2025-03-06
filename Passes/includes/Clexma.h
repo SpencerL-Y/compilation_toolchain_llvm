@@ -13,15 +13,25 @@ namespace llvm
         public:
         PreservedAnalyses run(Function& F, FunctionAnalysisManager& FA);
         private:
-        StringRef getDbgDeclareNameFromInst(Instruction *SI);
 
+
+        void createFreeMemlogStabs(CallInst*     CI, 
+                                   Function&     F,
+                                   BasicBlock&   BB, 
+                                   unsigned      line_num, 
+                                   StringRef     file_name);
+        
+        void createMallocMemlogStab(CallInst*    CI,
+                                    Function&    F,
+                                    BasicBlock&  BB,
+                                    unsigned     line_num,
+                                    StringRef    file_name);
+                                
         // function to construct table 
         void collectNameInfo(Function& F);
         void collectNameInfo(Instruction& I);
-        
-
         // register 2 source name table
-        DenseMap<Value*, StringRef> reg2Name;
+        DenseMap<Value*, std::string> reg2Name;
 
     };
 

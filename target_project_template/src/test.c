@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 int main() {
+    free(malloc(4));
     struct T {
         struct T* next;
     };
