@@ -52,6 +52,13 @@ def run_opt_pass(input_ll_file):
     
     return output_ll_file
 
+def link_single_to_logged_ll(ll_file, logging_ll):
+    output_logged_ll_name = os.path.splitext(ll_file)[0] + "_logged.bc"
+    link_command = ["llvm-link", ll_file, logging_ll, "-o", output_logged_ll_name]
+    print(f"Running command: {' '.join(link_command)}")
+    subprocess.run(link_command, check=True)
+    return output_logged_ll_name
+
 # 链接生成的 .ll 文件为可执行文件
 def link_to_executable(ll_files):
     output_exe = os.path.join(BUILD_DIR, "my_program")
@@ -81,15 +88,29 @@ def build():
     # 步骤3：链接生成可执行文件
     link_to_executable(passed_ll_files)
 
-def build_ll():
+def build_ll_and_link():
     print("Building ll files... ")
     ll_files = []
+    clexma_logging_file = ""
     for source_file in source_files:
         print("compiling source file: " + source_file)
         ll_file = compile_to_ll(source_file)
         ll_files.append(ll_file)
+        if is_clexma_logging_file(ll_file):
+            print("clexma logging file found")
+            clexma_logging_file = ll_file
+    
+    for ll_file in ll_files:
+        if not is_clexma_logging_file(ll_file):
+            link_single_to_logged_ll(ll_file, clexma_logging_file)
+
+def is_clexma_logging_file(file_name):
+    if file_name.find("clexma_logging") >= 0:
+        return True
+    else:
+        return False
     
 
 if __name__ == "__main__":
     # build()
-    build_ll()
+    build_ll_and_link()

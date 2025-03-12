@@ -26,7 +26,19 @@ namespace llvm
                                     BasicBlock&  BB,
                                     unsigned     line_num,
                                     StringRef    file_name);
-                                
+        
+        void createStorelogStab(StoreInst*        SI,
+                                Function&          F, 
+                                BasicBlock&       BB,
+                                unsigned    line_num,
+                                StringRef  file_name);
+
+        void createAllocalogStab(AllocaInst*        AI,
+                                 Function&           F,
+                                 BasicBlock&        BB,
+                                 unsigned     line_num,
+                                 StringRef   file_name);
+
         // function to construct table 
         void collectNameInfo(Function& F);
         void collectNameInfo(Instruction& I);

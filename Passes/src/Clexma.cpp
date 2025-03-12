@@ -125,6 +125,85 @@ void ClexmaPass::createMallocMemlogStab(CallInst*    CI,
     }
 }
 
+
+void ClexmaPass::createStorelogStab(StoreInst*        SI,
+                                    Function&          F, 
+                                    BasicBlock&       BB,
+                                    unsigned    line_num,
+                                    StringRef  file_name) {
+    Value* stored_ptr = SI->getPointerOperand();
+    if(this->reg2Name.find(stored_ptr) != this->reg2Name.end()) {
+        std::string var_name = this->reg2Name[stored_ptr];
+        // begin stabbing
+        for(auto itr = BB.begin(); itr != BB.end(); ++itr) {
+            if(&*itr == SI) {
+                IRBuilder<> builder(&BB, std::next(itr));
+                Function* log_store_func = F.getParent()->getFunction("clexma_log_store_result");
+                if(!log_store_func) {
+                    errs() << "ERROR: store logging function not found\n"; 
+                }
+
+                Value* stored_ptr_arg = SI->getPointerOperand();
+                Value* file_name_arg = builder.CreateGlobalStringPtr(file_name);
+                Value* line_arg = ConstantInt::get(Type::getInt32Ty(F.getContext()), line_num);
+                Value* var_arg = builder.CreateGlobalStringPtr(var_name);
+
+                std::vector<Value*> args;
+                args.push_back(stored_ptr_arg);
+                args.push_back(file_name_arg);
+                args.push_back(line_arg);
+                args.push_back(var_arg);
+                builder.CreateCall(log_store_func, args);
+                break;
+            }
+        }
+    } else {
+        // stored position does not corresponds to a pointer variable in source
+    }                                 
+}
+
+
+void ClexmaPass::createAllocalogStab(AllocaInst*        AI,
+                                     Function&           F,
+                                     BasicBlock&        BB,
+                                     unsigned     line_num,
+                                     StringRef   file_name) {
+    llvm::Type* type = AI->getType();
+    errs() << "createAllocalogStab: " << *type << "\n";
+    std::string var_name = "";
+    bool has_ptr_var_name = false;
+    if(type->isPointerTy()) {
+        if(this->reg2Name.find(AI) != this->reg2Name.end()) {
+            var_name = this->reg2Name[AI];
+            has_ptr_var_name = true;
+        }
+    }
+    if(has_ptr_var_name) {
+        // begin stabbing
+        for(auto itr = BB.begin(); itr != BB.end(); ++itr) {
+            if(&*itr == AI) {
+                IRBuilder<> builder(&BB, std::next(itr));
+                Function* log_alloca_func = F.getParent()->getFunction("clexma_log_alloca_result");
+                if(!log_alloca_func) {
+                    errs() << "ERROR: alloca logging function not found\n";
+                }
+                Value* var_arg = builder.CreateGlobalStringPtr(var_name);
+                Value* file_name_arg = builder.CreateGlobalStringPtr(file_name);
+                Value* line_arg = ConstantInt::get(Type::getInt32Ty(F.getContext()), line_num);
+            
+                std::vector<Value*> args;
+                args.push_back(var_arg);
+                args.push_back(file_name_arg);
+                args.push_back(line_arg);
+                builder.CreateCall(log_alloca_func, args);
+                break;
+            }
+        }
+    } else {
+        // if the alloca variable is not a pointer variable we skip the stabbing process
+    }
+}
+
 void ClexmaPass::createFreeMemlogStabs(CallInst* CI, 
                                        Function& F,
                                        BasicBlock& BB, 
@@ -140,7 +219,8 @@ void ClexmaPass::createFreeMemlogStabs(CallInst* CI,
             var_name = this->reg2Name[freed_arg];
             errs() << "free_arg found: " << var_name << "\n";
         } else {
-            errs() << "ERROR: free does not found a source var name\n";
+            var_name = "[no varname]";
+            errs() << "Not direct source var name available\n";
         }
 
         // begin stabbing
@@ -222,8 +302,10 @@ PreservedAnalyses ClexmaPass::run(Function& F,
                 errs() << "\t\t- Load Instruction: " << I << "\n";
             } else if(auto* SI = dyn_cast<StoreInst>(&I)) {
                 errs() << "\t\t- Store Instruction: " << I << "\n";
+                this->createStorelogStab(SI, F, BB, line_num, file_name);
             } else if(auto* AI = dyn_cast<AllocaInst>(&I)) {
                 errs() << "\t\t- Alloca Instruction: " << I << "\n";
+                this->createAllocalogStab(AI, F, BB, line_num, file_name);
             } 
             else {
                 errs() << "\t\t- Unknown Instruction: " <<  I << "\n";
