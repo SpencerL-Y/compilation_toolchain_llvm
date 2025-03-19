@@ -43,7 +43,6 @@ def compile_to_ll(source_file):
 def run_opt_pass(input_ll_file):
     output_ll_file = input_ll_file.replace(".ll", "_passed.ll")
     
-    # 确保 opt 指定输出文件
     opt_command = [
         "opt", "--passes=clexma", input_ll_file, "-o", output_ll_file
     ]
@@ -58,6 +57,8 @@ def link_single_to_logged_ll(ll_file, logging_ll):
     print(f"Running command: {' '.join(link_command)}")
     subprocess.run(link_command, check=True)
     return output_logged_ll_name
+
+def compile_linked_bc_to_binary()
 
 # 链接生成的 .ll 文件为可执行文件
 def link_to_executable(ll_files):
@@ -103,6 +104,22 @@ def build_ll_and_link():
     for ll_file in ll_files:
         if not is_clexma_logging_file(ll_file):
             link_single_to_logged_ll(ll_file, clexma_logging_file)
+
+def build_ll_link_and_compile():
+    print("Building ll files... ")
+    ll_files = []
+    clexma_logging_file = ""
+    for source_file in source_files:
+        print("compiling source file: " + source_file)
+        ll_file = compile_to_ll(source_file)
+        ll_files.append(ll_file)
+        if is_clexma_logging_file(ll_file):
+            print("clexma logging file found")
+            clexma_logging_file = ll_file
+    
+    for ll_file in ll_files:
+        if not is_clexma_logging_file(ll_file):
+            linked_file_name = link_single_to_logged_ll(ll_file, clexma_logging_file)
 
 def is_clexma_logging_file(file_name):
     if file_name.find("clexma_logging") >= 0:
