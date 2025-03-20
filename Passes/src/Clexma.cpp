@@ -23,6 +23,15 @@ void ClexmaPass::collectNameInfo(Function& F) {
 }
 
 
+bool ClexmaPass::is_stabbing_function_name(std::string func_name) {
+    if(func_name.find("clexma_log") != std::string::npos) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
 void ClexmaPass::collectNameInfo(Instruction& I){
     for(DbgRecord& DR : I.getDbgRecordRange()) {
         if(auto *ValueRecord = dyn_cast<DbgVariableRecord>(&DR)) {
@@ -272,8 +281,12 @@ void ClexmaPass::createFreeMemlogStabs(CallInst* CI,
 PreservedAnalyses ClexmaPass::run(Function& F,
                                   FunctionAnalysisManager &AM) {
 
+    std::string passed_function_name = F.getName().str();
+    if(this->is_stabbing_function_name(passed_function_name)) {
+        return PreservedAnalyses::all();
+    }
     this->collectNameInfo(F);
-    errs() << "===== Function Name: " << F.getName() << "\n";
+    errs() << "===== Function Name: " << passed_function_name<< "\n";
     for(auto &BB : F) {
         errs() << "\t----- BasicBlock Name: " << BB.getName() << "\n";
         

@@ -45,7 +45,11 @@ namespace llvm
         // register 2 source name table
         DenseMap<Value*, std::string> reg2Name;
 
+        bool is_stabbing_function_name(std::string func_name);
+
     };
+
+
 
     
 } // namespace llvm
