@@ -100,19 +100,19 @@ define dso_local void @clexma_log_store_result(ptr noundef %0, ptr noundef %1, i
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local void @clexma_log_alloca_result(ptr noundef %0, i32 noundef %1, ptr noundef %2) #0 !dbg !102 {
+define dso_local void @clexma_log_alloca_result(ptr noundef %0, ptr noundef %1, i32 noundef %2) #0 !dbg !102 {
   %4 = alloca ptr, align 8
-  %5 = alloca i32, align 4
-  %6 = alloca ptr, align 8
+  %5 = alloca ptr, align 8
+  %6 = alloca i32, align 4
   store ptr %0, ptr %4, align 8
     #dbg_declare(ptr %4, !105, !DIExpression(), !106)
-  store i32 %1, ptr %5, align 4
+  store ptr %1, ptr %5, align 8
     #dbg_declare(ptr %5, !107, !DIExpression(), !108)
-  store ptr %2, ptr %6, align 8
+  store i32 %2, ptr %6, align 4
     #dbg_declare(ptr %6, !109, !DIExpression(), !110)
-  %7 = load ptr, ptr %6, align 8, !dbg !111
-  %8 = load ptr, ptr %4, align 8, !dbg !112
-  %9 = load i32, ptr %5, align 4, !dbg !113
+  %7 = load ptr, ptr %4, align 8, !dbg !111
+  %8 = load ptr, ptr %5, align 8, !dbg !112
+  %9 = load i32, ptr %6, align 4, !dbg !113
   %10 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, ptr noundef %7, ptr noundef %8, i32 noundef %9), !dbg !114
   ret void, !dbg !115
 }
@@ -126,7 +126,7 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 
 !0 = !DIGlobalVariableExpression(var: !1, expr: !DIExpression())
 !1 = distinct !DIGlobalVariable(scope: null, file: !2, line: 6, type: !3, isLocal: true, isDefinition: true)
-!2 = !DIFile(filename: "src/clexma_logging.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "f52682f913ad0a032c563c43bafa5e67")
+!2 = !DIFile(filename: "src/clexma_logging.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "9664e6584067eca1591dc473c7d6c7bb")
 !3 = !DICompositeType(tag: DW_TAG_array_type, baseType: !4, size: 568, elements: !5)
 !4 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_signed_char)
 !5 = !{!6}
@@ -149,7 +149,7 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 !22 = !DIGlobalVariableExpression(var: !23, expr: !DIExpression())
 !23 = distinct !DIGlobalVariable(scope: null, file: !2, line: 22, type: !3, isLocal: true, isDefinition: true)
 !24 = distinct !DICompileUnit(language: DW_LANG_C11, file: !25, producer: "clang version 21.0.0git", isOptimized: false, runtimeVersion: 0, emissionKind: FullDebug, globals: !26, splitDebugInlining: false, nameTableKind: None)
-!25 = !DIFile(filename: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/clexma_logging.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "f52682f913ad0a032c563c43bafa5e67")
+!25 = !DIFile(filename: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template/src/clexma_logging.c", directory: "/home/clexma/Desktop/fox3/llvm_passes/target_project_template", checksumkind: CSK_MD5, checksum: "9664e6584067eca1591dc473c7d6c7bb")
 !26 = !{!0, !7, !12, !17, !22}
 !27 = !{i32 7, !"Dwarf Version", i32 5}
 !28 = !{i32 2, !"Debug Info Version", i32 3}
@@ -228,13 +228,13 @@ attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protect
 !101 = !DILocation(line: 19, column: 1, scope: !87)
 !102 = distinct !DISubprogram(name: "clexma_log_alloca_result", scope: !2, file: !2, line: 21, type: !103, scopeLine: 21, flags: DIFlagPrototyped, spFlags: DISPFlagDefinition, unit: !24, retainedNodes: !42)
 !103 = !DISubroutineType(types: !104)
-!104 = !{null, !39, !41, !39}
-!105 = !DILocalVariable(name: "filename", arg: 1, scope: !102, file: !2, line: 21, type: !39)
+!104 = !{null, !39, !39, !41}
+!105 = !DILocalVariable(name: "varname", arg: 1, scope: !102, file: !2, line: 21, type: !39)
 !106 = !DILocation(line: 21, column: 43, scope: !102)
-!107 = !DILocalVariable(name: "line", arg: 2, scope: !102, file: !2, line: 21, type: !41)
-!108 = !DILocation(line: 21, column: 57, scope: !102)
-!109 = !DILocalVariable(name: "varname", arg: 3, scope: !102, file: !2, line: 21, type: !39)
-!110 = !DILocation(line: 21, column: 75, scope: !102)
+!107 = !DILocalVariable(name: "filename", arg: 2, scope: !102, file: !2, line: 21, type: !39)
+!108 = !DILocation(line: 21, column: 64, scope: !102)
+!109 = !DILocalVariable(name: "line", arg: 3, scope: !102, file: !2, line: 21, type: !41)
+!110 = !DILocation(line: 21, column: 78, scope: !102)
 !111 = !DILocation(line: 22, column: 87, scope: !102)
 !112 = !DILocation(line: 22, column: 96, scope: !102)
 !113 = !DILocation(line: 22, column: 106, scope: !102)

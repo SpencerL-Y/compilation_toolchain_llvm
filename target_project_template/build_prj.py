@@ -40,54 +40,36 @@ def compile_to_ll(source_file):
     return ll_file
 
 # 运行 LLVM Pass
-def run_opt_pass(input_ll_file):
-    output_ll_file = input_ll_file.replace(".ll", "_passed.ll")
+def run_main_pass(input_bc_file_path, main_pass_path):
+    output_bc_file_path = input_bc_file_path.replace(".bc", "_passed.bc")
     
     opt_command = [
-        "opt", "--passes=clexma", input_ll_file, "-o", output_ll_file
+        main_pass_path, input_bc_file_path, output_bc_file_path
     ]
     print(f"Running command: {' '.join(opt_command)}")
     subprocess.run(opt_command, check=True)
     
-    return output_ll_file
+    return output_bc_file_path
 
-def link_single_to_logged_ll(ll_file, logging_ll):
-    output_logged_ll_name = os.path.splitext(ll_file)[0] + "_logged.bc"
-    link_command = ["llvm-link", ll_file, logging_ll, "-o", output_logged_ll_name]
+def link_single_to_logged_bc(ll_file, logging_ll):
+    output_logged_bc_path = os.path.splitext(ll_file)[0] + "_logged.bc"
+    link_command = ["llvm-link", ll_file, logging_ll, "-o", output_logged_bc_path]
     print(f"Running command: {' '.join(link_command)}")
     subprocess.run(link_command, check=True)
-    return output_logged_ll_name
+    return output_logged_bc_path
 
-def compile_linked_bc_to_binary()
-
-# 链接生成的 .ll 文件为可执行文件
-def link_to_executable(ll_files):
-    output_exe = os.path.join(BUILD_DIR, "my_program")
-    
-    clang_command = [
-        "clang", "-o", output_exe, *ll_files
-    ]
-    print(f"Running command: {' '.join(clang_command)}")
+def compile_linked_bc_to_binary(merged_bc_file_path, main_pass_path, output_folder_path):
+    # do the stabbing
+    passed_bc_file_path = run_main_pass(merged_bc_file_path, main_pass_path)
+    # compile the stabbed bc to binary
+    merged_bc_file_name = os.path.splitext(os.path.basename(passed_bc_file_path))[0]
+    output_bin_path = output_folder_path + merged_bc_file_name + "_bin"
+    clang_command = ["clang", passed_bc_file_path, "-o", output_bin_path]
+    print("Compiling linked bc to binary")
+    print(f"Running command: {' '.join(clang_command)}" )
     subprocess.run(clang_command, check=True)
-
-# 主构建流程
-def build():
-    print("Building project...")
-
-    # 步骤1：编译源文件为 .ll 文件
-    ll_files = []
-    for source_file in source_files:
-        ll_file = compile_to_ll(source_file)
-        ll_files.append(ll_file)
-
-    # 步骤2：运行 LLVM Pass 处理每个 .ll 文件
-    passed_ll_files = []
-    for ll_file in ll_files:
-        passed_ll_file = run_opt_pass(ll_file)
-        passed_ll_files.append(passed_ll_file)
-
-    # 步骤3：链接生成可执行文件
-    link_to_executable(passed_ll_files)
+    return output_bin_path
+    
 
 def build_ll_and_link():
     print("Building ll files... ")
@@ -103,23 +85,25 @@ def build_ll_and_link():
     
     for ll_file in ll_files:
         if not is_clexma_logging_file(ll_file):
-            link_single_to_logged_ll(ll_file, clexma_logging_file)
+            link_single_to_logged_bc(ll_file, clexma_logging_file)
 
-def build_ll_link_and_compile():
+def build_ll_link_and_compile(main_pass_path, output_folder):
     print("Building ll files... ")
     ll_files = []
     clexma_logging_file = ""
     for source_file in source_files:
         print("compiling source file: " + source_file)
-        ll_file = compile_to_ll(source_file)
-        ll_files.append(ll_file)
-        if is_clexma_logging_file(ll_file):
+        ll_file_path = compile_to_ll(source_file)
+        ll_files.append(ll_file_path)
+        if is_clexma_logging_file(ll_file_path):
             print("clexma logging file found")
-            clexma_logging_file = ll_file
+            clexma_logging_file = ll_file_path
     
     for ll_file in ll_files:
         if not is_clexma_logging_file(ll_file):
-            linked_file_name = link_single_to_logged_ll(ll_file, clexma_logging_file)
+            linked_file_path = link_single_to_logged_bc(ll_file, clexma_logging_file)
+            print("file linked: " + linked_file_path)
+            compile_linked_bc_to_binary(linked_file_path, main_pass_path, output_folder)
 
 def is_clexma_logging_file(file_name):
     if file_name.find("clexma_logging") >= 0:
@@ -129,5 +113,12 @@ def is_clexma_logging_file(file_name):
     
 
 if __name__ == "__main__":
-    # build()
-    build_ll_and_link()
+    if len(sys.argv) != 3:
+        print("Argument insufficient\n Usage: python3 build_prj.py [main pass path] [output folder]")
+    
+    main_pass_path = sys.argv[1]
+    output_folder = sys.argv[2]
+    print("main pass path: " + sys.argv[1])
+    print("output folder: " + sys.argv[2])
+    # build_ll_and_link()
+    build_ll_link_and_compile(main_pass_path, output_folder)

@@ -18,6 +18,6 @@ void clexma_log_store_result(void *ptr, const char* filename, int line, const ch
     printf("[STORE RESULT] store ptr: %p, in file %s, at line %d, variable name: %s\n", ptr, filename, line, varname);
 }
 
-void clexma_log_alloca_result(const char* filename, int line, const char* varname) {
-    printf("[STACK PTR VAR CREATED] ptr variable name: %s, in file %s, at line %d\n", varname, filename, line);;
+void clexma_log_alloca_result(const char* varname, const char* filename, int line) {
+    printf("[STACK PTR VAR CREATED] ptr variable name: %s, in file %s, at line %d\n", varname, filename, line);
 }
