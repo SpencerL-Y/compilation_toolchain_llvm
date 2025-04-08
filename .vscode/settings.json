@@ -63,6 +63,11 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "aliascheck.h": "c",
+        "*.def": "c",
+        "*.inc": "c",
+        "forward_list": "c",
+        "std_testcase_io.h": "c"
     }
 }

@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
 
 
 void clexma_log_malloc_result(void* ptr, const char* filename, int line, const char* varname) {
@@ -20,4 +22,10 @@ void clexma_log_store_result(void *ptr, const char* filename, int line, const ch
 
 void clexma_log_alloca_result(const char* varname, const char* filename, int line) {
     printf("[STACK PTR VAR CREATED] ptr variable name: %s, in file %s, at line %d\n", varname, filename, line);
+}
+
+int __VERIFIER_nondet_int() {
+    srand(time(NULL));
+    int r1 = rand();  
+    return r1;   
 }

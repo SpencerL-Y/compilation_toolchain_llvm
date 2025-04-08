@@ -5,9 +5,9 @@ import sys
 
 # 设置项目的路径
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIR = os.path.join(PROJECT_DIR, 'src')
-BUILD_DIR = os.path.join(PROJECT_DIR, 'build')
-INCLUDE_DIR = os.path.join(PROJECT_DIR, 'includes')
+SOURCE_DIR = os.path.join(PROJECT_DIR, 'src/')
+BUILD_DIR = os.path.join(PROJECT_DIR, 'build/')
+INCLUDE_DIR = os.path.join(PROJECT_DIR, 'includes/')
 
 # 确保构建目录存在
 os.makedirs(BUILD_DIR, exist_ok=True)
