@@ -1,0 +1,37 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1 ":
+/*
+ * Function pointer.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+#include "aliascheck.h"
+
+void func1(int *p, int *q) {
+	// if function pointer solved correctly,
+	// p and q will alias due to CS1
+------- LABEL 1
+	*p = *q;
+}
+
+void (*fp)(int*,int*);
+
+int main() {
+	int x, y;
+	int *m, *n;
+	if (x) {
+		m = &x, n = &x;
+		fp = func1;
+		fp(m,n); // CS1
+	}
+	else {
+		m = &x; n = &y;
+//		func1(m,n); // CS2
+	}
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MUST alias

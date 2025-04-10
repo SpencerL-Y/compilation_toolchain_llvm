@@ -1,0 +1,32 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression c alias in the following program at the position with "------- LABEL 3 ":
+#include "aliascheck.h"
+int *alloc( int size){
+
+	return malloc(1);
+
+}
+
+void foo(int **p){
+
+	*p = alloc(1);
+	//*p = alloc();
+
+}
+
+void main(){
+
+	int *a,*b,*c;
+	foo(&a);
+	foo(&b);
+	foo(&c);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+The two pointer expression NO alias
