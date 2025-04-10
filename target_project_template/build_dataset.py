@@ -29,8 +29,8 @@ def parse_alias_stmt(line):
     return None
 
 def create_labelled_data():
-    accumulated_program = ""
     for item in list(Path(TARGET_LABELLED_SRC).rglob("*.c")):
+        accumulated_program = ""
         label_id = 0
         label_id2test_result = {}
         f = open(item, "r")
@@ -45,8 +45,9 @@ def create_labelled_data():
             else:
                 accumulated_program += line
         new_file_name = os.path.splitext(os.path.basename(item))[0] + "_labelled.c"
-        nf = open(os.path.join(TRAINING_DATA_FOLDER, new_file_name),"w")
+        nf = open(os.path.join(TRAINING_DATA_FOLDER, new_file_name),"w+")
         nf.write(accumulated_program)
+        nf.close()
         nfl = open(os.path.join(TRAINING_DATA_FOLDER, os.path.splitext(os.path.basename(item))[0] + "_labels.txt"),"w")
         for key in label_id2test_result:
             print(label_id2test_result[key])
