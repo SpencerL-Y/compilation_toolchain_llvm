@@ -1,0 +1,4 @@
+LABEL 1,s[0].f1,s[0].f2,NO
+LABEL 2,s[0].f1,s[1].f2,NO
+LABEL 3,s[0].f1,s[1].f1,MAY
+LABEL 4,s[0].f1,s[1].f2,MUST

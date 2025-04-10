@@ -1,0 +1,4 @@
+LABEL 1,a,&c,MAY
+LABEL 2,b,&d,MAY
+LABEL 3,a,&d,NO
+LABEL 4,b,&c,NO

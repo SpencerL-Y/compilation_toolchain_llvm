@@ -1,0 +1,2 @@
+LABEL 1,*qq_int,q_int,MUST
+LABEL 2,q_int,&a_int,MUST

@@ -1,0 +1,3 @@
+LABEL 1,a,b,NO
+LABEL 2,b,c,NO
+LABEL 3,a,c,NO

@@ -1,0 +1,2 @@
+LABEL 1,a,&ss,NO
+LABEL 2,b,&ss,NO

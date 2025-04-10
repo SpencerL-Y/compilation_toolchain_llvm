@@ -1,0 +1,4 @@
+LABEL 1,&pint1->f1,&pint2->f1,MUST
+LABEL 2,&pint1->f1,&s.f1,MUST
+LABEL 3,&qint1->f1,&qint2->f1,MUST
+LABEL 4,&qint1->f1,&t.f1,MUST

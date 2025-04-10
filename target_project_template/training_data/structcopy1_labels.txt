@@ -1,0 +1,2 @@
+LABEL 1,void*,void*,MAY
+LABEL 2,x.b.n,y.b.n,MAY

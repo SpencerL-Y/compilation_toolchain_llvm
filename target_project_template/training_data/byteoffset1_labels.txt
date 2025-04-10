@@ -1,0 +1,1 @@
+LABEL 1,structA->f,&FuncA,MAY

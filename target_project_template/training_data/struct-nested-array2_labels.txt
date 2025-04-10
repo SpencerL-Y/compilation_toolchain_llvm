@@ -1,0 +1,2 @@
+LABEL 1,p->out3.mid2[1].in1[1],&x,MAY
+LABEL 2,s.out3.mid2[3].in1[0],&y,MAY

@@ -1,0 +1,2 @@
+LABEL 1,x,y,NO
+LABEL 2,x,z,NO

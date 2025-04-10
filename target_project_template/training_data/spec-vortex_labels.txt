@@ -1,0 +1,1 @@
+LABEL 1,PartLib01,&Rectangle_draw,NO

@@ -1,0 +1,1 @@
+LABEL 1,s[a].f1,s[b].f2,NO
