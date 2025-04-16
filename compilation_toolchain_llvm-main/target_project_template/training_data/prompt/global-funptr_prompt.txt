@@ -1,0 +1,39 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression q and pointer expression &y alias in the following program at the position with "------- LABEL 1":
+/*
+ * Global variables with function pointer initialisation.
+ * Author: Sen Ye
+ * Date: 07/05/2014
+ */
+#include "aliascheck.h"
+
+int x, y;
+int* p;
+
+void foo() {
+	p = &y;
+}
+
+struct MyStruct {
+	void (*fp)();
+	int* f1;
+};
+
+struct MyStruct context = { foo, &x };
+
+int main()
+{
+	(*context.fp)();
+	int* q = p;
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: q,&y
+2. RESULT: MAY
+3. REASON: The function `foo` assigns the address of `y` to `p`, and then `q` is assigned the value of `p`, so `q` may point to `y` depending on the execution of `foo`.

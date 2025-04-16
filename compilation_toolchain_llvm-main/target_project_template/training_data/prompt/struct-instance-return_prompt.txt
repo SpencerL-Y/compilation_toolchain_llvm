@@ -1,0 +1,74 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression m.f1 and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Return a struct instance from function.
+ * Author: Sen Ye
+ * Date: 07/05/2014
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int* f1;
+	char f2;
+};
+
+int x, y;
+
+struct MyStruct foo() {
+	struct MyStruct m;
+	m.f1 = &x;
+	return m;
+}
+
+int main() {
+	struct MyStruct m;
+	m = foo();
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: m.f1,&x
+2. RESULT: MUST
+3. REASON: The pointer m.f1 is directly assigned the address of x in the function foo(), ensuring they always point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression m.f1 and pointer expression &y alias in the following program at the position with "------- LABEL 2":
+/*
+ * Return a struct instance from function.
+ * Author: Sen Ye
+ * Date: 07/05/2014
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int* f1;
+	char f2;
+};
+
+int x, y;
+
+struct MyStruct foo() {
+	struct MyStruct m;
+	m.f1 = &x;
+	return m;
+}
+
+int main() {
+	struct MyStruct m;
+	m = foo();
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: m.f1,&y
+2. RESULT: NO
+3. REASON: The pointer m.f1 is assigned the address of x in the function foo, and there are no assignments or operations that could change m.f1 to point to the address of y. Different variables x and y have distinct memory addresses, so m.f1 and &y never point to the same location.

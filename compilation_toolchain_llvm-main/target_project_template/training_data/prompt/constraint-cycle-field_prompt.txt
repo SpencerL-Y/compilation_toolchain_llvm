@@ -1,0 +1,76 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression q->next and pointer expression p->next->next alias in the following program at the position with "------- LABEL 1":
+/*
+ * Field cycle.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+
+#include <stdlib.h>
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	struct MyStruct * next;
+};
+
+int main() {
+	struct MyStruct * p = (struct MyStruct *) malloc (sizeof(struct MyStruct));
+	int num = 10;
+	while (num) {
+		p->next = (struct MyStruct *) malloc (sizeof(struct MyStruct));
+		p->next->f1 = (int *) malloc (sizeof(int));
+		p = p->next;
+	}
+	struct MyStruct *q = p;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: q->next,p->next->next
+2. RESULT: MAY
+3. REASON: Both q->next and p->next->next are dynamically allocated in a loop, and due to the uncertainty of loop execution and dynamic memory allocation, they may potentially point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression q->f1 and pointer expression p->next->f1 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Field cycle.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+
+#include <stdlib.h>
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	struct MyStruct * next;
+};
+
+int main() {
+	struct MyStruct * p = (struct MyStruct *) malloc (sizeof(struct MyStruct));
+	int num = 10;
+	while (num) {
+		p->next = (struct MyStruct *) malloc (sizeof(struct MyStruct));
+		p->next->f1 = (int *) malloc (sizeof(int));
+		p = p->next;
+	}
+	struct MyStruct *q = p;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: q->f1,p->next->f1
+2. RESULT: MAY
+3. REASON: Both q->f1 and p->next->f1 are fields in different instances of the same struct type, and due to the loop, they may point to the same memory location allocated for f1 in different iterations.

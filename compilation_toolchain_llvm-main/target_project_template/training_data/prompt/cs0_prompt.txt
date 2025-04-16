@@ -1,0 +1,110 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression p alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int* foo(int* x){
+   return x;
+}
+
+int main(){
+
+  int *x,*y,*p,*q,a,b;
+  p = &a;
+  q = &b;
+  x = foo(p);
+  y = foo(q);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,p
+2. RESULT: MUST
+3. REASON: The function `foo` returns the pointer it receives, so after `x = foo(p);`, `x` and `p` must alias as they point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression q alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int* foo(int* x){
+   return x;
+}
+
+int main(){
+
+  int *x,*y,*p,*q,a,b;
+  p = &a;
+  q = &b;
+  x = foo(p);
+  y = foo(q);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,q
+2. RESULT: NO
+3. REASON: The pointers y and q are initialized to point to different memory locations, as y is assigned the result of foo(q) which returns q, and q is directly assigned the address of b, while y is assigned the result of foo(q) which returns q. Since y is assigned the result of foo(q) and q is directly assigned the address of b, they point to different memory locations.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression q alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int* foo(int* x){
+   return x;
+}
+
+int main(){
+
+  int *x,*y,*p,*q,a,b;
+  p = &a;
+  q = &b;
+  x = foo(p);
+  y = foo(q);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,q
+2. RESULT: NO
+3. REASON: Pointers x and q are initialized to point to different memory locations, &a and &b respectively, and there are no assignments or operations that could cause them to alias.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression p alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int* foo(int* x){
+   return x;
+}
+
+int main(){
+
+  int *x,*y,*p,*q,a,b;
+  p = &a;
+  q = &b;
+  x = foo(p);
+  y = foo(q);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,p
+2. RESULT: NO
+3. REASON: The pointer `y` is assigned the result of `foo(q)`, which returns `q`, while `p` is directly assigned the address of `a`. Since `p` and `q` are initialized with addresses of different variables (`a` and `b` respectively), `y` and `p` never point to the same location.

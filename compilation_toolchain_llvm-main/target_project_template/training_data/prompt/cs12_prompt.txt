@@ -1,0 +1,56 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &obj alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int obj;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+	x = &c;
+	foo(x,y);
+------- LABEL 2
+	
+}
+
+void foo(int **p, int **q){
+	*p = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,&obj
+2. RESULT: MAY
+3. REASON: The pointer `a` is assigned the address of `obj` through the indirect assignment `*p = ADDRESS_OF[&obj]` in the function `foo`, which is called with `x` pointing to `a`. However, after LABEL 1, `x` is reassigned to point to `c`, and `foo` is called again, which does not affect `a`. Therefore, `a` may or may not point to `obj` depending on the execution path taken.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &obj alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int obj;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+	x = &c;
+	foo(x,y);
+------- LABEL 2
+	
+}
+
+void foo(int **p, int **q){
+	*p = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,&obj
+2. RESULT: MAY
+3. REASON: After the second call to `foo`, `*x` is assigned the address of `obj`, and since `x` is reassigned to point to `c`, `c` may point to `obj`.

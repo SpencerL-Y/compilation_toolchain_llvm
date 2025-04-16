@@ -1,0 +1,166 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression &pint1->f1 and pointer expression &pint2->f1 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct with one field.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct IntStruct {
+	int f1;
+};
+
+struct CharStruct {
+	char f1;
+};
+
+int main() {
+	struct IntStruct* pint1, *pint2;
+	struct IntStruct s;
+	pint1 = &s;
+	pint2 = &s;
+------- LABEL 1
+------- LABEL 2
+	
+	struct CharStruct* qint1, *qint2;
+	struct CharStruct t;
+	qint1 = &t;
+	qint2 = &t;
+------- LABEL 3
+------- LABEL 4
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: &pint1->f1,&pint2->f1
+2. RESULT: MUST
+3. REASON: Both pint1 and pint2 are directly assigned the address of the same struct instance 's', so they always point to the same memory location for the field 'f1'.
+[QUESTION]
+Analyze whether pointer expression &pint1->f1 and pointer expression &s.f1 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct with one field.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct IntStruct {
+	int f1;
+};
+
+struct CharStruct {
+	char f1;
+};
+
+int main() {
+	struct IntStruct* pint1, *pint2;
+	struct IntStruct s;
+	pint1 = &s;
+	pint2 = &s;
+------- LABEL 1
+------- LABEL 2
+	
+	struct CharStruct* qint1, *qint2;
+	struct CharStruct t;
+	qint1 = &t;
+	qint2 = &t;
+------- LABEL 3
+------- LABEL 4
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: &pint1->f1,&s.f1
+2. RESULT: MUST
+3. REASON: Both pint1 and pint2 are directly assigned the address of the same struct instance 's', making &pint1->f1 and &s.f1 guaranteed to point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression &qint1->f1 and pointer expression &qint2->f1 alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct with one field.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct IntStruct {
+	int f1;
+};
+
+struct CharStruct {
+	char f1;
+};
+
+int main() {
+	struct IntStruct* pint1, *pint2;
+	struct IntStruct s;
+	pint1 = &s;
+	pint2 = &s;
+------- LABEL 1
+------- LABEL 2
+	
+	struct CharStruct* qint1, *qint2;
+	struct CharStruct t;
+	qint1 = &t;
+	qint2 = &t;
+------- LABEL 3
+------- LABEL 4
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: &qint1->f1,&qint2->f1
+2. RESULT: MUST
+3. REASON: Both qint1 and qint2 are directly assigned the address of the same struct instance 't', so their field accesses &qint1->f1 and &qint2->f1 must alias.
+[QUESTION]
+Analyze whether pointer expression &qint1->f1 and pointer expression &t.f1 alias in the following program at the position with "------- LABEL 4":
+/*
+ * Struct with one field.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct IntStruct {
+	int f1;
+};
+
+struct CharStruct {
+	char f1;
+};
+
+int main() {
+	struct IntStruct* pint1, *pint2;
+	struct IntStruct s;
+	pint1 = &s;
+	pint2 = &s;
+------- LABEL 1
+------- LABEL 2
+	
+	struct CharStruct* qint1, *qint2;
+	struct CharStruct t;
+	qint1 = &t;
+	qint2 = &t;
+------- LABEL 3
+------- LABEL 4
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: &qint1->f1,&t.f1
+2. RESULT: MUST
+3. REASON: Both qint1 and qint2 are directly assigned the address of struct t, making &qint1->f1 and &t.f1 point to the same memory location.

@@ -1,0 +1,39 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *pp and pointer expression *qq alias in the following program at the position with "------- LABEL 1":
+/*
+ * Global pointer in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int **pp, **qq;
+int *p, *q;
+int x;
+
+void foo() {
+	pp = &p;
+	p = &x;
+}
+
+void bar() {
+	qq = &q;
+	q = &x;
+}
+
+int main() {
+	foo();
+	bar();
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: *pp,*qq
+2. RESULT: MAY
+3. REASON: Both *pp and *qq are assigned to point to the address of the same variable x through different paths, so they may alias.

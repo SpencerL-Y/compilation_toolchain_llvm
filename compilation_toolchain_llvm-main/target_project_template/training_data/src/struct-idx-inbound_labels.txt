@@ -1,0 +1,2 @@
+LABEL 1,void*,void*,NO
+LABEL 2,c,d,NO

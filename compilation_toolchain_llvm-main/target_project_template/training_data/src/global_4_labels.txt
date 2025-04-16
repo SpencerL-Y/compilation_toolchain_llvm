@@ -1,0 +1,2 @@
+LABEL 1,b,w,NO
+LABEL 2,b,&g,MUST

@@ -1,0 +1,119 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression void* and pointer expression void* alias in the following program at the position with "------- LABEL 1":
+------- LABEL 1
+struct interesting {
+        int dummy;
+        void (*f1)(int*);
+        void (*f2)(int*);
+};
+
+struct nested_ptr {
+        int dummy;
+        struct interesting* ptr;
+};
+
+int g;
+------- LABEL 2
+------- LABEL 3
+
+struct interesting i1 = {
+        .f1 = f1,
+        .f2 = f2
+};
+
+struct nested_ptr n1 = {
+        .ptr = &i1
+};
+
+void test_ptr() {
+        struct interesting interesting_stub = *n1.ptr;
+        interesting_stub.f1(&g);
+        interesting_stub.f2(&g);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: void*, void*
+2. RESULT: NO
+3. REASON: The pointers in question are function pointers `f1` and `f2` within the `struct interesting`. Different fields within a struct never alias, and since `f1` and `f2` are different fields, they cannot point to the same location.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &g alias in the following program at the position with "------- LABEL 2":
+------- LABEL 1
+struct interesting {
+        int dummy;
+        void (*f1)(int*);
+        void (*f2)(int*);
+};
+
+struct nested_ptr {
+        int dummy;
+        struct interesting* ptr;
+};
+
+int g;
+------- LABEL 2
+------- LABEL 3
+
+struct interesting i1 = {
+        .f1 = f1,
+        .f2 = f2
+};
+
+struct nested_ptr n1 = {
+        .ptr = &i1
+};
+
+void test_ptr() {
+        struct interesting interesting_stub = *n1.ptr;
+        interesting_stub.f1(&g);
+        interesting_stub.f2(&g);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: a,&g
+2. RESULT: NO
+3. REASON: Pointer 'a' is not defined in the given program, and '&g' is a direct address of the global variable 'g', which is never assigned to any other pointer.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &g alias in the following program at the position with "------- LABEL 3":
+------- LABEL 1
+struct interesting {
+        int dummy;
+        void (*f1)(int*);
+        void (*f2)(int*);
+};
+
+struct nested_ptr {
+        int dummy;
+        struct interesting* ptr;
+};
+
+int g;
+------- LABEL 2
+------- LABEL 3
+
+struct interesting i1 = {
+        .f1 = f1,
+        .f2 = f2
+};
+
+struct nested_ptr n1 = {
+        .ptr = &i1
+};
+
+void test_ptr() {
+        struct interesting interesting_stub = *n1.ptr;
+        interesting_stub.f1(&g);
+        interesting_stub.f2(&g);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: a,&g
+2. RESULT: MAY
+3. REASON: The function pointers f1 and f2 in the struct 'interesting' are invoked with the address of 'g', and since the exact behavior of these functions is unknown, they may modify or use 'g', leading to potential aliasing with other pointers.

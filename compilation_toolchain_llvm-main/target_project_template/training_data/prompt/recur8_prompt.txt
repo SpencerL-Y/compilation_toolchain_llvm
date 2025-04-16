@@ -1,0 +1,119 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &b alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int z1,z2;
+void foo(int **p);
+void bar(int **a){
+	if(z1>5) return;
+	z1++;
+	int *c, b;
+	*a = &b;
+	c = *a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	foo(a);
+}
+
+
+void foo(int** p){
+
+	p = malloc(10);
+	*p = &z2;
+	bar(p);
+}
+
+int main(){
+
+	int **x, *y;
+	x = &y;
+	y = &z1;
+	foo(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,&b
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned the value of `*a`, which is set to the address of `b` in one execution path, but `foo` may modify `*a` to point elsewhere, leading to uncertainty.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &z1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int z1,z2;
+void foo(int **p);
+void bar(int **a){
+	if(z1>5) return;
+	z1++;
+	int *c, b;
+	*a = &b;
+	c = *a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	foo(a);
+}
+
+
+void foo(int** p){
+
+	p = malloc(10);
+	*p = &z2;
+	bar(p);
+}
+
+int main(){
+
+	int **x, *y;
+	x = &y;
+	y = &z1;
+	foo(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,&z1
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned the value of `*a`, which is initially set to the address of `b`. However, `foo` is called with `a` as an argument, and within `foo`, `*p` is set to the address of `z2`. Since `bar` is called recursively and `z1` is initially assigned to `y` in `main`, there is a potential execution path where `c` could point to `z1`. Thus, `c` and `&z1` may alias.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &z2 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int z1,z2;
+void foo(int **p);
+void bar(int **a){
+	if(z1>5) return;
+	z1++;
+	int *c, b;
+	*a = &b;
+	c = *a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	foo(a);
+}
+
+
+void foo(int** p){
+
+	p = malloc(10);
+	*p = &z2;
+	bar(p);
+}
+
+int main(){
+
+	int **x, *y;
+	x = &y;
+	y = &z1;
+	foo(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,&z2
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned the value of `*a`, which is set to point to `&b` in `bar`. However, `foo` assigns `*p` to `&z2`, and since `bar` calls `foo`, `c` may end up pointing to `&z2` through the indirect assignment path.

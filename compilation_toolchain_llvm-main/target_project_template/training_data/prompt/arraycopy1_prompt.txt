@@ -1,0 +1,36 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression void* and pointer expression void* alias in the following program at the position with "------- LABEL 1":
+------- LABEL 1
+int main() {
+	int a, b;
+	int* source[2] = {&a, &b};
+	int* x = source[1];
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: source[0], source[1]
+2. RESULT: NO
+3. REASON: The pointers source[0] and source[1] are initialized to point to different memory locations, &a and &b respectively, and since they are different variables, they never alias.
+[QUESTION]
+Analyze whether pointer expression &a and pointer expression x alias in the following program at the position with "------- LABEL 2":
+------- LABEL 1
+int main() {
+	int a, b;
+	int* source[2] = {&a, &b};
+	int* x = source[1];
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &a,x
+2. RESULT: NO
+3. REASON: The pointer x is assigned to source[1], which points to &b, while &a is a separate memory location.

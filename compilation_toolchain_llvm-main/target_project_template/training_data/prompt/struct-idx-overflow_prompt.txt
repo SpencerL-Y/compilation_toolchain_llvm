@@ -1,0 +1,66 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression void* and pointer expression void* alias in the following program at the position with "------- LABEL 1":
+------- LABEL 1
+
+struct S {int f0; int f1; int f2;};
+
+int main()
+{
+	struct S s;
+	void *a, *b, *c, *d;
+	
+	a = &s;
+	b = &((struct S*) a)->f2;
+	c = &((struct S*) b)->f2;
+	d = &((struct S*) a)->f1;
+	
+------- LABEL 2
+
+	return 0;
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,c
+2. RESULT: MUST
+3. REASON: Both b and c are assigned to the address of the same field f2 of the struct S instance, hence they always point to the same memory location.
+
+1. POINTERS: b,d
+2. RESULT: NO
+3. REASON: b points to the field f2 and d points to the field f1 of the same struct S instance, and different fields in a struct never alias.
+
+1. POINTERS: c,d
+2. RESULT: NO
+3. REASON: c points to the field f2 and d points to the field f1 of the same struct S instance, and different fields in a struct never alias.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression d alias in the following program at the position with "------- LABEL 2":
+------- LABEL 1
+
+struct S {int f0; int f1; int f2;};
+
+int main()
+{
+	struct S s;
+	void *a, *b, *c, *d;
+	
+	a = &s;
+	b = &((struct S*) a)->f2;
+	c = &((struct S*) b)->f2;
+	d = &((struct S*) a)->f1;
+	
+------- LABEL 2
+
+	return 0;
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,d
+2. RESULT: NO
+3. REASON: Pointers c and d point to different fields of the same struct instance, and different struct fields never alias.

@@ -1,0 +1,39 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *pp and pointer expression *qq alias in the following program at the position with "------- LABEL 1":
+/*
+ * Global variable
+ * Author: Sen Ye
+ * Date: 13/10/2013
+ * Description: initialise global variables when declared
+ *		and check alias in main function.
+ */
+#include "aliascheck.h"
+
+int x;
+int *p, *q;
+int **pp = &p;
+int **qq = &q;
+
+void foo() {
+	p = &x;
+}
+
+void bar() {
+	q = &x;
+}
+
+int main() {
+------- LABEL 1
+	foo();
+	bar();
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: *pp,*qq
+2. RESULT: MAY
+3. REASON: Both *pp and *qq are assigned the address of the same variable 'x' through different execution paths in functions 'foo' and 'bar', so they may point to the same location.

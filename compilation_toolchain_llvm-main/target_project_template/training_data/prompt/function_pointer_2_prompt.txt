@@ -1,0 +1,76 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Function pointer.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+#include "aliascheck.h"
+
+
+void func1(int **p, int **q) {
+	*p = *q;
+------- LABEL 1
+}
+
+void (*fp)(int**,int**);
+
+int main() {
+	int o1, o2;
+	int *x, *y;
+	int **m, **n;
+	x = &o1;
+	y = &o2;
+	m = &x;
+	n = &x;
+	fp = func1;
+	fp(m,n);
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MUST
+3. REASON: In function `func1`, the assignment `*p = *q` ensures that `*p` and `*q` point to the same memory location, making `p` and `q` must-alias at LABEL 1.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression y alias in the following program at the position with "------- LABEL 2":
+/*
+ * Function pointer.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+#include "aliascheck.h"
+
+
+void func1(int **p, int **q) {
+	*p = *q;
+------- LABEL 1
+}
+
+void (*fp)(int**,int**);
+
+int main() {
+	int o1, o2;
+	int *x, *y;
+	int **m, **n;
+	x = &o1;
+	y = &o2;
+	m = &x;
+	n = &x;
+	fp = func1;
+	fp(m,n);
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,y
+2. RESULT: NO
+3. REASON: Pointers x and y are initialized to point to different memory locations, &o1 and &o2 respectively, and there are no assignments or operations in the program that could cause them to alias.

@@ -1,0 +1,101 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &obj alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int obj, t,s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+	*b = 5;
+	c=&s;
+	//a=c;
+	if(t) { x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	foo(x,y);
+------- LABEL 2
+------- LABEL 3
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&obj
+2. RESULT: MAY
+3. REASON: The pointer `b` is assigned the address of `obj` through the function `foo`, which assigns `*q` to `&obj`. Since `y` is initially `ADDRESS_OF[&b]`, `b` may point to `obj` after the first call to `foo`.
+[QUESTION]
+Analyze whether pointer expression e and pointer expression d alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int obj, t,s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+	*b = 5;
+	c=&s;
+	//a=c;
+	if(t) { x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	foo(x,y);
+------- LABEL 2
+------- LABEL 3
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: e,d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, both `e` and `d` may be assigned the address of `obj` through the function `foo`, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression e and pointer expression &obj alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int obj, t,s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+	*b = 5;
+	c=&s;
+	//a=c;
+	if(t) { x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	foo(x,y);
+------- LABEL 2
+------- LABEL 3
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: e,&obj
+2. RESULT: MAY
+3. REASON: The pointer `e` is assigned the address of `d` or `e` in the `else` branch, and `*d` is assigned the address of `obj` in the `foo` function, creating a potential alias between `e` and `&obj`.

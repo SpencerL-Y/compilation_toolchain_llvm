@@ -1,0 +1,84 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression pms2->f4 and pointer expression pms1->f2.f3 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Nested structs
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct2 {
+	int * f3;
+	int * f4;
+};
+
+struct MyStruct1 {
+	int *f1;
+	struct MyStruct2 f2;
+};
+
+int main()
+{
+	struct MyStruct1 ms;
+	struct MyStruct1 *pms1;
+	struct MyStruct2 *pms2;
+	int a, b, c;
+	ms.f1 = &c;
+	ms.f2.f3 = &a;
+	ms.f2.f4 = &b;
+	pms1 = &ms;
+	pms2 = &ms.f2;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: pms2->f4,pms1->f2.f3
+2. RESULT: NO
+3. REASON: Different fields within the same struct instance never alias due to field sensitivity.
+[QUESTION]
+Analyze whether pointer expression pms2->f3 and pointer expression pms1->f2.f3 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Nested structs
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct2 {
+	int * f3;
+	int * f4;
+};
+
+struct MyStruct1 {
+	int *f1;
+	struct MyStruct2 f2;
+};
+
+int main()
+{
+	struct MyStruct1 ms;
+	struct MyStruct1 *pms1;
+	struct MyStruct2 *pms2;
+	int a, b, c;
+	ms.f1 = &c;
+	ms.f2.f3 = &a;
+	ms.f2.f4 = &b;
+	pms1 = &ms;
+	pms2 = &ms.f2;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: pms2->f3,pms1->f2.f3
+2. RESULT: MUST
+3. REASON: Both pointers are assigned to the same memory location through the direct assignment `pms2 = &ms.f2`, making `pms2->f3` and `pms1->f2.f3` point to the same address.

@@ -1,0 +1,260 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: After the call to `bar`, `*p` is assigned the value of `*q`, which means `p` and `q` may point to the same location depending on the value of `*q` at runtime. Additionally, `foo` assigns a new address to `*q`, but since `p` and `q` are not directly reassigned to each other, they may still alias due to the previous assignment in `bar`.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &p1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,&p1
+2. RESULT: MUST
+3. REASON: The pointer `p` is initialized with the address of `p1` using `int **p = ADDRESS_OF[&p1];`, which guarantees that `p` always points to `&p1`.
+[QUESTION]
+Analyze whether pointer expression q1 and pointer expression r1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: q1,r1
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*z = *x`, which could make `r1` point to the same location as `q1` if `*x` was previously assigned to `q1`. The execution paths and indirect assignments create potential aliasing between `q1` and `r1`.
+[QUESTION]
+Analyze whether pointer expression a1 and pointer expression c1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a1,c1
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*z = *x`, which means `c1` could potentially point to the same location as `a1` if `*x` and `*z` are set to the same address in different calls to `foo`.
+[QUESTION]
+Analyze whether pointer expression q1 and pointer expression c1 alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: q1,c1
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*z = *x`, which means `r1` could point to the same location as `p1`. Since `bar` assigns `*k = *s`, `p1` could point to the same location as `q1`. Therefore, `r1` may point to the same location as `q1`. Similarly, `foo` is called with `a`, `b`, and `c`, which means `c1` could point to the same location as `a1`. Since `a1` is initialized to point to `a2`, and `q1` is initialized to point to `q2`, there is a potential for `q1` and `c1` to alias through these assignments and function calls.
+[QUESTION]
+Analyze whether pointer expression a1 and pointer expression r1 alias in the following program at the position with "------- LABEL 6":
+#include "aliascheck.h"
+void bar(int**k, int**s){
+
+	*k = *s;
+
+}
+
+void foo(int**x,int**y,int**z){
+	int t;
+	*y = &t;
+	*z = *x;
+}
+
+int main(){
+	int *p1,*q1,*r1,*a1,*b1,*c1,q2,a2;
+	int **p = &p1;
+	int **q = &q1;
+    q1 = &q2;
+	int **r = &r1;
+	int **a = &a1;
+    a1 = &a2;
+	int **b = &b1;
+	int **c = &c1;
+	bar(&p,&q);
+------- LABEL 1
+------- LABEL 2
+	foo(p,q,r);
+------- LABEL 3
+	foo(a,b,c);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a1,r1
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*z = *x`, which means `r1` could be assigned the value of `*p`, and since `bar` assigns `*p = *q`, `r1` could potentially point to the same location as `q1`. Meanwhile, `foo` also assigns `*y = ADDRESS_OF[&t]`, which does not affect `a1`. However, since `foo` is called with different arguments, `a1` and `r1` could potentially point to the same location due to the indirect assignments and the lack of information about the runtime values.

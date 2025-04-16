@@ -1,0 +1,74 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression n and pointer expression &y alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int main(){
+    int ***m,**n,*z,*y,z1,y1;
+
+    m=&n;
+    n=&z;
+    *m=&y;
+------- LABEL 1
+------- LABEL 2
+    z=&z1;
+    y=&y1;
+    ***m=10;
+    z=**m;
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: n,&y
+2. RESULT: MAY
+3. REASON: The pointer `n` is assigned the address of `z`, and `*m` is assigned the address of `y`. Since `m` points to `n`, `**m` points to `z`, and `z` is later assigned the value of `**m`, `z` and `y` may point to the same location, making `n` and `&y` potentially alias.
+[QUESTION]
+Analyze whether pointer expression n and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int main(){
+    int ***m,**n,*z,*y,z1,y1;
+
+    m=&n;
+    n=&z;
+    *m=&y;
+------- LABEL 1
+------- LABEL 2
+    z=&z1;
+    y=&y1;
+    ***m=10;
+    z=**m;
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: n,&z
+2. RESULT: MAY
+3. REASON: The pointer `n` is initially assigned the address of `z` through the indirect assignment `m=ADDRESS_OF[&n]; n=ADDRESS_OF[&z];`. However, later in the program, `z` is reassigned to point to `z1`, and `n` is indirectly reassigned through `*m=ADDRESS_OF[&y];`. Due to these indirect assignments and potential execution paths, `n` and `&z` may alias at some point, but not necessarily always.
+[QUESTION]
+Analyze whether pointer expression z and pointer expression &z1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int main(){
+    int ***m,**n,*z,*y,z1,y1;
+
+    m=&n;
+    n=&z;
+    *m=&y;
+------- LABEL 1
+------- LABEL 2
+    z=&z1;
+    y=&y1;
+    ***m=10;
+    z=**m;
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: z,&z1
+2. RESULT: MAY
+3. REASON: After the assignment `z=**m;`, `z` may point to the same location as `&z1` due to the indirect assignments and potential aliasing through `m` and `n`.

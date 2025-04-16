@@ -1,0 +1,104 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression b alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int *alloc( int size){
+
+	return malloc(1);
+
+}
+
+void foo(int **p){
+
+	*p = alloc(1);
+	//*p = alloc();
+
+}
+
+void main(){
+
+	int *a,*b,*c;
+	foo(&a);
+	foo(&b);
+	foo(&c);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,b
+2. RESULT: NO
+3. REASON: Each call to `foo` results in `a`, `b`, and `c` being assigned distinct memory locations returned by separate calls to `alloc`, which uses `malloc` to allocate memory. Since `malloc` returns different memory locations for each call, `a` and `b` will never point to the same location.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression c alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int *alloc( int size){
+
+	return malloc(1);
+
+}
+
+void foo(int **p){
+
+	*p = alloc(1);
+	//*p = alloc();
+
+}
+
+void main(){
+
+	int *a,*b,*c;
+	foo(&a);
+	foo(&b);
+	foo(&c);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,c
+2. RESULT: MAY
+3. REASON: The function `foo` assigns a newly allocated memory location to each pointer `a`, `b`, and `c`. Since `alloc` uses `malloc(1)`, which may return the same address if called multiple times in a short period and the memory is reused, `b` and `c` may alias.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression c alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int *alloc( int size){
+
+	return malloc(1);
+
+}
+
+void foo(int **p){
+
+	*p = alloc(1);
+	//*p = alloc();
+
+}
+
+void main(){
+
+	int *a,*b,*c;
+	foo(&a);
+	foo(&b);
+	foo(&c);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,c
+2. RESULT: MAY
+3. REASON: The function `foo` assigns a newly allocated memory location to each pointer passed to it, but since `alloc` always returns a newly allocated memory location, `a` and `c` could potentially point to the same location due to the conservative nature of memory allocation analysis.

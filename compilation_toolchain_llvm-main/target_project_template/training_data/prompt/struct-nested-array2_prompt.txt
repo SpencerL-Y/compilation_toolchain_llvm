@@ -1,0 +1,102 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p->out3.mid2[1].in1[1] and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct with array of structs and pointers.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int* in1[10];
+	char in2;
+	double in3;
+};
+
+struct MidArrayStruct {
+	char mid1;
+	struct InnerArrayStruct mid2[5];
+	double mid3[20];
+};
+
+struct ArrayStruct {
+	int out1;
+	char out2;
+	struct MidArrayStruct out3;
+	int* out4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int x, y;
+
+	s.out4 = &x;
+	p = &s;
+	p->out3.mid2[2].in1[2] = s.out4;
+	p->out3.mid2[3].in1[3] = &y;
+
+------- LABEL 1
+------- LABEL 2
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p->out3.mid2[1].in1[1],&x
+2. RESULT: NO
+3. REASON: The pointer p->out3.mid2[1].in1[1] is uninitialized and never assigned to point to &x, while p->out3.mid2[2].in1[2] is explicitly assigned to point to &x. Different struct array elements and uninitialized pointers do not alias with initialized pointers.
+[QUESTION]
+Analyze whether pointer expression s.out3.mid2[3].in1[0] and pointer expression &y alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct with array of structs and pointers.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int* in1[10];
+	char in2;
+	double in3;
+};
+
+struct MidArrayStruct {
+	char mid1;
+	struct InnerArrayStruct mid2[5];
+	double mid3[20];
+};
+
+struct ArrayStruct {
+	int out1;
+	char out2;
+	struct MidArrayStruct out3;
+	int* out4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int x, y;
+
+	s.out4 = &x;
+	p = &s;
+	p->out3.mid2[2].in1[2] = s.out4;
+	p->out3.mid2[3].in1[3] = &y;
+
+------- LABEL 1
+------- LABEL 2
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s.out3.mid2[3].in1[0],&y
+2. RESULT: NO
+3. REASON: The pointer s.out3.mid2[3].in1[0] is uninitialized and never assigned to point to &y, while s.out3.mid2[3].in1[3] is explicitly assigned to &y. Different indices in the same array may alias, but since s.out3.mid2[3].in1[0] is uninitialized, it cannot alias with &y.

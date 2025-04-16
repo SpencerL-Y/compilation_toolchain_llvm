@@ -1,0 +1,3 @@
+LABEL 1,c,d,MUST
+LABEL 2,c,d,MAY
+LABEL 3,&b,d,NO

@@ -1,0 +1,82 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *pp and pointer expression *qq alias in the following program at the position with "------- LABEL 1":
+/*
+ * Global pointer in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int **pp, **qq;
+int *p, *q;
+int x, y;
+
+void foo() {
+	pp = &p;
+	p = &x;
+	qq = &q;
+	q = &y;
+------- LABEL 1
+}
+
+void bar() {
+	qq = &q;
+	q = &x;
+}
+
+int main() {
+	foo();
+	bar();
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: *pp,*qq
+2. RESULT: MAY
+3. REASON: After executing `foo()`, *pp points to `x` and *qq points to `y`. However, after executing `bar()`, *qq is updated to point to `x`, creating a potential alias with *pp. Thus, *pp and *qq may alias depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression *pp and pointer expression *qq alias in the following program at the position with "------- LABEL 2":
+/*
+ * Global pointer in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int **pp, **qq;
+int *p, *q;
+int x, y;
+
+void foo() {
+	pp = &p;
+	p = &x;
+	qq = &q;
+	q = &y;
+------- LABEL 1
+}
+
+void bar() {
+	qq = &q;
+	q = &x;
+}
+
+int main() {
+	foo();
+	bar();
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: *pp,*qq
+2. RESULT: MAY
+3. REASON: After executing `foo()`, *pp points to `x` and *qq points to `y`. However, after executing `bar()`, *qq is updated to point to `x`, creating a potential alias with *pp.

@@ -1,0 +1,2 @@
+LABEL 1,m.f1,&x,MAY
+LABEL 2,m.f1,&y,NO

@@ -1,0 +1,58 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *qq_int and pointer expression q_int alias in the following program at the position with "------- LABEL 1":
+/*
+ * Global variables test.
+ * Author: Sen Ye
+ * Date: 03/05/2014
+ */
+#include "aliascheck.h"
+
+int a_int = 10;
+int* p_int = &a_int;
+int** pp_int = &p_int;
+
+int main() {
+	int b_int = a_int;
+	int* q_int = p_int;
+	int** qq_int = pp_int;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: *qq_int,q_int
+2. RESULT: MUST
+3. REASON: Both *qq_int and q_int are directly assigned from pp_int and p_int respectively, which are initialized to point to the same memory location as p_int, thus they must alias.
+[QUESTION]
+Analyze whether pointer expression q_int and pointer expression &a_int alias in the following program at the position with "------- LABEL 2":
+/*
+ * Global variables test.
+ * Author: Sen Ye
+ * Date: 03/05/2014
+ */
+#include "aliascheck.h"
+
+int a_int = 10;
+int* p_int = &a_int;
+int** pp_int = &p_int;
+
+int main() {
+	int b_int = a_int;
+	int* q_int = p_int;
+	int** qq_int = pp_int;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: q_int,&a_int
+2. RESULT: MAY
+3. REASON: q_int is assigned the value of p_int, which points to a_int, so q_int may point to the same location as &a_int.

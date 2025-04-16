@@ -1,0 +1,152 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s2.out4 and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct assignment.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int* in1[10];
+	int* in2[20];
+	char in3;
+};
+
+struct MidArrayStruct {
+	char mid1[10];
+	struct InnerArrayStruct mid2[5];
+};
+
+struct ArrayStruct {
+	char out2;
+	struct MidArrayStruct out3;
+	int* out4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s1, s2;
+	int x, y;
+
+	s1.out4 = &x;
+	p = &s1;
+	p->out3.mid2[3].in1[3] = &y;
+
+	s2 = s1;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: s2.out4,&x
+2. RESULT: MAY
+3. REASON: The pointer s1.out4 is assigned the address of x, and since s2 is a copy of s1, s2.out4 may also point to the same address as s1.out4, which is &x.
+[QUESTION]
+Analyze whether pointer expression s2.out3.mid2[1].in1[1] and pointer expression &y alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct assignment.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int* in1[10];
+	int* in2[20];
+	char in3;
+};
+
+struct MidArrayStruct {
+	char mid1[10];
+	struct InnerArrayStruct mid2[5];
+};
+
+struct ArrayStruct {
+	char out2;
+	struct MidArrayStruct out3;
+	int* out4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s1, s2;
+	int x, y;
+
+	s1.out4 = &x;
+	p = &s1;
+	p->out3.mid2[3].in1[3] = &y;
+
+	s2 = s1;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s2.out3.mid2[1].in1[1],&y
+2. RESULT: MAY
+3. REASON: The assignment `s2 = s1` copies the entire structure, including pointers, and since `s1.out3.mid2[3].in1[3]` is assigned to `&y`, and array indices are uncertain at runtime, `s2.out3.mid2[1].in1[1]` may alias with `&y`.
+[QUESTION]
+Analyze whether pointer expression s2.out3.mid2[3].in1[20] and pointer expression &y alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct assignment.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int* in1[10];
+	int* in2[20];
+	char in3;
+};
+
+struct MidArrayStruct {
+	char mid1[10];
+	struct InnerArrayStruct mid2[5];
+};
+
+struct ArrayStruct {
+	char out2;
+	struct MidArrayStruct out3;
+	int* out4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s1, s2;
+	int x, y;
+
+	s1.out4 = &x;
+	p = &s1;
+	p->out3.mid2[3].in1[3] = &y;
+
+	s2 = s1;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s2.out3.mid2[3].in1[20],&y
+2. RESULT: MAY
+3. REASON: The assignment `POINTER_OP[p->out3].POINTER_OP[mid2[3].in1][3] = ADDRESS_OF[&y];` suggests that `s1.out3.mid2[3].in1[3]` points to `&y`. Since `s2` is a copy of `s1`, and array indices are uncertain at runtime, `s2.out3.mid2[3].in1[20]` may alias with `&y`.

@@ -1,0 +1,2 @@
+LABEL 1,s[a].f1,s[b].f2,NO
+LABEL 2,s[a].f1,s[b].f1,MAY

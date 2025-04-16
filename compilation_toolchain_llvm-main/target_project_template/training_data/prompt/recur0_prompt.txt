@@ -1,0 +1,98 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &y alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int *x, y, z;
+
+void f() {
+  if(z > 5) return;
+  z++;
+  if (1) {
+         x = &y;
+------- LABEL 1
+          f();
+         x = &z;
+------- LABEL 2
+------- LABEL 3
+          f();
+  }
+}
+
+
+int main()
+{
+           f();
+	   return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,&y
+2. RESULT: MAY
+3. REASON: Due to the recursive nature of function `f`, there are execution paths where `x` is assigned the address of `y` before the function returns, leading to a potential aliasing situation.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int *x, y, z;
+
+void f() {
+  if(z > 5) return;
+  z++;
+  if (1) {
+         x = &y;
+------- LABEL 1
+          f();
+         x = &z;
+------- LABEL 2
+------- LABEL 3
+          f();
+  }
+}
+
+
+int main()
+{
+           f();
+	   return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,&z
+2. RESULT: MAY
+3. REASON: Due to the recursive nature of function `f`, `x` may be assigned the address of `z` in one execution path, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &y alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int *x, y, z;
+
+void f() {
+  if(z > 5) return;
+  z++;
+  if (1) {
+         x = &y;
+------- LABEL 1
+          f();
+         x = &z;
+------- LABEL 2
+------- LABEL 3
+          f();
+  }
+}
+
+
+int main()
+{
+           f();
+	   return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,&y
+2. RESULT: MAY
+3. REASON: Due to the recursive nature of function `f` and the conditional assignments, `x` may point to `&y` before the recursive call, but it is reassigned to `&z` after the call, creating a potential aliasing scenario depending on the execution path.

@@ -1,0 +1,4 @@
+LABEL 1,pdst->f1[9],&x,MAY
+LABEL 2,pdst->f3[3].in2,&y,MAY
+LABEL 3,psrc->f1[2],&z,NO
+LABEL 4,psrc->f3[1].in2,&z,MAY

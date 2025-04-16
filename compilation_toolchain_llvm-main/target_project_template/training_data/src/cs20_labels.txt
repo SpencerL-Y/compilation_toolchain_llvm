@@ -1,0 +1,4 @@
+LABEL 1,b,&d,MUST
+LABEL 2,b,&c,NO
+LABEL 3,a,&c,MUST
+LABEL 4,a,&d,NO

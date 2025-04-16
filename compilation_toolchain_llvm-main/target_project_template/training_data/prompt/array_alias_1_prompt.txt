@@ -1,0 +1,162 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[0].f2 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Array alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int x, y;
+	s[0].f1 = &x;
+	s[1].f2 = &y;
+
+	// Arrays are treated as a single element.
+	// Different fields have its own points-to set.
+	// Same fields have same points-to set, even they belong
+	// to different elements.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	s[0].f1 = &y;
+------- LABEL 4
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[0].f2
+2. RESULT: NO
+3. REASON: Different struct fields never alias due to field sensitivity.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Array alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int x, y;
+	s[0].f1 = &x;
+	s[1].f2 = &y;
+
+	// Arrays are treated as a single element.
+	// Different fields have its own points-to set.
+	// Same fields have same points-to set, even they belong
+	// to different elements.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	s[0].f1 = &y;
+------- LABEL 4
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f2
+2. RESULT: MAY
+3. REASON: s[0].f1 and s[1].f2 are fields in different struct array elements, and due to conservative array handling, they may alias after s[0].f1 is reassigned to point to the same address as s[1].f2.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f1 alias in the following program at the position with "------- LABEL 3":
+/*
+ * Array alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int x, y;
+	s[0].f1 = &x;
+	s[1].f2 = &y;
+
+	// Arrays are treated as a single element.
+	// Different fields have its own points-to set.
+	// Same fields have same points-to set, even they belong
+	// to different elements.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	s[0].f1 = &y;
+------- LABEL 4
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f1
+2. RESULT: NO
+3. REASON: Different fields in struct instances never alias, and s[1].f1 is never initialized.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 4":
+/*
+ * Array alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int x, y;
+	s[0].f1 = &x;
+	s[1].f2 = &y;
+
+	// Arrays are treated as a single element.
+	// Different fields have its own points-to set.
+	// Same fields have same points-to set, even they belong
+	// to different elements.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	s[0].f1 = &y;
+------- LABEL 4
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f2
+2. RESULT: MAY
+3. REASON: Different fields in struct instances may alias due to conservative array handling and potential runtime index overlap.

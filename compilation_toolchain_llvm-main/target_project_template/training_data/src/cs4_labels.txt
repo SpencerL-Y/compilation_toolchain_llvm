@@ -1,0 +1,6 @@
+LABEL 1,b,&d,MUST
+LABEL 2,c,&a1,MUST
+LABEL 3,p,&r,MUST
+LABEL 4,p,q,MUST
+LABEL 5,b,p,NO
+LABEL 6,c,p,NO

@@ -1,0 +1,2 @@
+LABEL 1,a,&obj,MUST
+LABEL 2,c,&obj,MUST

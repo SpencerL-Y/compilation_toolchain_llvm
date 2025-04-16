@@ -1,0 +1,142 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &c alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,*q;
+    int *a,*b,c,d;
+    p = &a;
+    if(p){
+        if(c){
+            q = &c;
+        }
+    }
+    else{
+        p = &b;
+        q = &d;
+    }
+    if(d){
+        *p = q;
+    }
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: a,&c
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `*p` could be assigned the address of `c` through `q`, leading to a potential alias between `a` and `&c`.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &d alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,*q;
+    int *a,*b,c,d;
+    p = &a;
+    if(p){
+        if(c){
+            q = &c;
+        }
+    }
+    else{
+        p = &b;
+        q = &d;
+    }
+    if(d){
+        *p = q;
+    }
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: b,&d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `b` and `&d` may both be assigned to `*p` through indirect assignment, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &d alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,*q;
+    int *a,*b,c,d;
+    p = &a;
+    if(p){
+        if(c){
+            q = &c;
+        }
+    }
+    else{
+        p = &b;
+        q = &d;
+    }
+    if(d){
+        *p = q;
+    }
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,&d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `*p` could be assigned the address of `d`, making `a` potentially point to the same location as `&d`.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &c alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,*q;
+    int *a,*b,c,d;
+    p = &a;
+    if(p){
+        if(c){
+            q = &c;
+        }
+    }
+    else{
+        p = &b;
+        q = &d;
+    }
+    if(d){
+        *p = q;
+    }
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,&c
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `b` may be assigned the address of `q`, which could be `&c` if the first `if` condition is true and `c` is non-zero.

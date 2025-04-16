@@ -1,0 +1,68 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &a alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int main(){
+
+    int **a,**b,**c;
+    int k;
+    a=&b;
+    *a=&c;
+    *b=&a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+    
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,&a
+2. RESULT: MAY
+3. REASON: The pointer `c` is indirectly assigned through `*a`, which is set to point to `&c`, and `*b` is set to point to `&a`. Since `a` is assigned the address of `b`, `*b` can potentially point to `&c`, creating a possible aliasing scenario between `c` and `&a`.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &c alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int main(){
+
+    int **a,**b,**c;
+    int k;
+    a=&b;
+    *a=&c;
+    *b=&a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+    
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&c
+2. RESULT: MAY
+3. REASON: The pointer `b` is assigned the address of `c` through the indirect assignment `*a = ADDRESS_OF[&c]`, and since `a` is initialized to point to `b`, `b` may point to `c`.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &b alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int main(){
+
+    int **a,**b,**c;
+    int k;
+    a=&b;
+    *a=&c;
+    *b=&a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+    
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,&b
+2. RESULT: NO
+3. REASON: Pointer 'a' is assigned the address of 'b', making 'a' point to 'b', but '&b' is the address of 'b' itself, which is a distinct memory location from 'a'.

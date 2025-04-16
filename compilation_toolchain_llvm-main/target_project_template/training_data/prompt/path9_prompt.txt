@@ -1,0 +1,162 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression g1.sub.d and pointer expression &k2 alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+typedef struct subagg1{
+    int *d;
+}subagg1;
+
+typedef struct agg1{
+    int *c;
+    subagg1 sub;
+}agg1;
+
+int main(){
+    int *a,*b,k1,k2;
+    agg1 g1,g2;
+    agg1 *g = &g1;
+
+    if(k1){
+        g = &g2;
+        a = &k1;
+    }
+    else{
+        a = &k2;
+    }
+
+    g->sub.d = a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: g1.sub.d,&k2
+2. RESULT: MAY
+3. REASON: Depending on the execution path, g1.sub.d may be assigned the address of either k1 or k2, leading to potential aliasing with &k2.
+[QUESTION]
+Analyze whether pointer expression g2.sub.d and pointer expression &k1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+typedef struct subagg1{
+    int *d;
+}subagg1;
+
+typedef struct agg1{
+    int *c;
+    subagg1 sub;
+}agg1;
+
+int main(){
+    int *a,*b,k1,k2;
+    agg1 g1,g2;
+    agg1 *g = &g1;
+
+    if(k1){
+        g = &g2;
+        a = &k1;
+    }
+    else{
+        a = &k2;
+    }
+
+    g->sub.d = a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: g2.sub.d,&k1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, g2.sub.d may be assigned the address of k1, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression g1.sub.d and pointer expression &k1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+typedef struct subagg1{
+    int *d;
+}subagg1;
+
+typedef struct agg1{
+    int *c;
+    subagg1 sub;
+}agg1;
+
+int main(){
+    int *a,*b,k1,k2;
+    agg1 g1,g2;
+    agg1 *g = &g1;
+
+    if(k1){
+        g = &g2;
+        a = &k1;
+    }
+    else{
+        a = &k2;
+    }
+
+    g->sub.d = a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: g1.sub.d,&k1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, g1.sub.d may be assigned the address of k1, leading to a potential aliasing situation.
+[QUESTION]
+Analyze whether pointer expression g2.sub.d and pointer expression &k2 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+typedef struct subagg1{
+    int *d;
+}subagg1;
+
+typedef struct agg1{
+    int *c;
+    subagg1 sub;
+}agg1;
+
+int main(){
+    int *a,*b,k1,k2;
+    agg1 g1,g2;
+    agg1 *g = &g1;
+
+    if(k1){
+        g = &g2;
+        a = &k1;
+    }
+    else{
+        a = &k2;
+    }
+
+    g->sub.d = a;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: g2.sub.d,&k2
+2. RESULT: MAY
+3. REASON: Depending on the execution path, g2.sub.d may be assigned the address of either k1 or k2, making it possible for g2.sub.d to point to the same location as &k2.

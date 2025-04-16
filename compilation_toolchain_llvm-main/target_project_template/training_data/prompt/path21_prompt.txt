@@ -1,0 +1,104 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression r and pointer expression q alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int main(){
+    int ***p,**a,**b,*q,*r,*f,v,z,*g,f1; 
+
+    p = &a;
+    a = b = &f;
+    f = &f1;
+    q = &v;
+
+    if(a){
+        f = &z;
+        *p = &g;
+        b = *p;
+    }
+    else{
+
+
+    }
+
+    *a = q;
+    r = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: r,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `r` and `q` may point to the same location if the condition `if(a)` is true, as `*a` is assigned `q` and `r` is assigned `*b`, which could be the same as `*a` due to the assignment `b = *p` and `*p = ADDRESS_OF[&g]`.
+[QUESTION]
+Analyze whether pointer expression r and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int main(){
+    int ***p,**a,**b,*q,*r,*f,v,z,*g,f1; 
+
+    p = &a;
+    a = b = &f;
+    f = &f1;
+    q = &v;
+
+    if(a){
+        f = &z;
+        *p = &g;
+        b = *p;
+    }
+    else{
+
+
+    }
+
+    *a = q;
+    r = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: r,&z
+2. RESULT: MAY
+3. REASON: In the execution path where `a` is non-null, `f` is assigned the address of `z`, and `b` is updated to point to `g` through `*p`. Since `*a` is assigned to `q` and `r` is assigned `*b`, `r` may point to `z` if `b` is updated to point to `g` which could potentially be `z`. Thus, `r` and `&z` may alias.
+[QUESTION]
+Analyze whether pointer expression r and pointer expression &f1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int main(){
+    int ***p,**a,**b,*q,*r,*f,v,z,*g,f1; 
+
+    p = &a;
+    a = b = &f;
+    f = &f1;
+    q = &v;
+
+    if(a){
+        f = &z;
+        *p = &g;
+        b = *p;
+    }
+    else{
+
+
+    }
+
+    *a = q;
+    r = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: r,&f1
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment of `f` to `&z` within the `if(a)` block, `r` may point to either `&f1` or `&z`, depending on the execution path, leading to potential aliasing with `&f1`.

@@ -1,0 +1,92 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q, *r;
+	int x, y, z;
+	p = &x;
+	q = &y;
+	r = &z;
+------- LABEL 1
+	p = q;
+------- LABEL 2
+	p = r;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: After the assignment at LABEL 1, p and q MUST alias. However, at LABEL 2, p is reassigned to r, which breaks the aliasing with q. Considering all possible execution paths, p and q MAY alias.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 2":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q, *r;
+	int x, y, z;
+	p = &x;
+	q = &y;
+	r = &z;
+------- LABEL 1
+	p = q;
+------- LABEL 2
+	p = r;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: After the assignment at LABEL 1, p and q MUST alias, but after LABEL 2, p is reassigned to r, breaking the alias. Considering all execution paths, p and q MAY alias.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 3":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q, *r;
+	int x, y, z;
+	p = &x;
+	q = &y;
+	r = &z;
+------- LABEL 1
+	p = q;
+------- LABEL 2
+	p = r;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: After the assignment at LABEL 1, p and q MUST alias, but after LABEL 2, p is reassigned to r, breaking the alias. Considering all execution paths, p and q MAY alias.

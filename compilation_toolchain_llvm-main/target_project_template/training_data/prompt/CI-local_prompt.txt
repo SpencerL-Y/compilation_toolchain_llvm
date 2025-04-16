@@ -1,0 +1,39 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression m and pointer expression n alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias due to context-insensitive
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+void foo(int *m, int *n)
+{
+------- LABEL 1
+}
+
+int main()
+{
+	int *p, *q;
+	int a,b;
+	if (a) {
+		p = &a;
+		q = &b;
+		foo(p,q);
+	}
+	else {
+		p = &b;
+		q = &a;
+		foo(p,q);
+	}
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: m,n
+2. RESULT: MAY
+3. REASON: Depending on the execution path, m and n may point to the same address, as they are assigned the addresses of either `a` or `b` in different orders.

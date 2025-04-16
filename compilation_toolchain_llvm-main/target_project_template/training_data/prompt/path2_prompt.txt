@@ -1,0 +1,230 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &a alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p,&a
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment within the if statement, p may point to either &a or &b, leading to a potential alias with &a.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &b alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p,&b
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment, p may point to the address of b, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression n and pointer expression &a1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: n,&a1
+2. RESULT: MAY
+3. REASON: Due to the conditional swap of `p` and `q`, `n` may point to `&a1` if the condition is true, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression n and pointer expression &b1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: n,&b1
+2. RESULT: MAY
+3. REASON: Due to the conditional swap of `p` and `q`, `n` may point to `&b1` if the condition is true, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Due to the conditional swap of `p` and `q`, they may point to the same location depending on the execution path taken.
+[QUESTION]
+Analyze whether pointer expression n and pointer expression &m1 alias in the following program at the position with "------- LABEL 6":
+#include "aliascheck.h"
+
+int main(){
+
+    int **p,**q;
+    int *a,*b;
+    int *m,*n;
+    int a1,b1,m1;
+
+    a = &a1;
+    b = &b1;
+    m = &m1;
+	p = &a;
+	q = &b;
+
+    if(a){
+	    p = &b;
+	    q = &a;
+    }
+
+    *p = m;
+	n = *q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: n,&m1
+2. RESULT: MAY
+3. REASON: Due to the conditional swapping of `p` and `q`, `n` may be assigned the address of `m1` through `*q`.

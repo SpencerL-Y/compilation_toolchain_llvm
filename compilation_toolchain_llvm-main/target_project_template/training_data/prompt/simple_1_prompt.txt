@@ -1,0 +1,56 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q;
+	int x, y;
+	p = &x;
+	q = &y;
+------- LABEL 1
+	p = q;
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MUST
+3. REASON: After the assignment `p = q` at LABEL 1, both pointers p and q are guaranteed to point to the same memory location, making them must-alias.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 2":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q;
+	int x, y;
+	p = &x;
+	q = &y;
+------- LABEL 1
+	p = q;
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MUST
+3. REASON: After the direct assignment `p = q` at LABEL 1, pointers p and q are guaranteed to point to the same memory location, thus they MUST alias.

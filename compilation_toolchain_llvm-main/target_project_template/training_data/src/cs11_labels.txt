@@ -1,0 +1,4 @@
+LABEL 1,p,&q,MUST
+LABEL 2,x,&y,MUST
+LABEL 3,x,&q,NO
+LABEL 4,p,&y,NO

@@ -1,0 +1,122 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression &p->f3.f1[10] and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct with array of structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int f1[100];
+};
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	struct InnerArrayStruct f3;
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3.f1[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &p->f3.f1[10],q
+2. RESULT: MAY
+3. REASON: The pointers &p->f3.f1[10] and q may alias because q is assigned to point to an element of the same array (s.f3.f1) as &p->f3.f1[10], and array indices are uncertain at runtime, allowing for potential aliasing.
+[QUESTION]
+Analyze whether pointer expression &p->f3.f1[20] and pointer expression &p->f3.f1[30] alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct with array of structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int f1[100];
+};
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	struct InnerArrayStruct f3;
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3.f1[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &p->f3.f1[20],&p->f3.f1[30]
+2. RESULT: MAY
+3. REASON: Array elements with different indices may alias due to uncertain runtime index values.
+[QUESTION]
+Analyze whether pointer expression &p->f3.f1[0] and pointer expression &s.f4 alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct with array of structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int f1[100];
+};
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	struct InnerArrayStruct f3;
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3.f1[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: &p->f3.f1[0],&s.f4
+2. RESULT: NO
+3. REASON: Different struct fields never alias, and &p->f3.f1[0] points to an element in the array field f3.f1, while &s.f4 points to a separate field f4 in the struct.

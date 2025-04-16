@@ -1,0 +1,74 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a1 and pointer expression &d1 alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+void foo(int **w,int**x,int **y, int *z){
+	int *t;
+	*y = z;
+	t = *x;
+	*w = t;
+
+}
+
+void bar(int **p1,int**p2,int **p3, int *p4){
+	foo(p1,p2,p3,p4);
+}
+
+int main(){
+
+	int **a,**b,**c,*d,*a1,*b1,*c1,d1;
+	a = &a1;
+	b = &b1;
+	c = &b1;
+	d = &d1;
+	bar(a,b,c,d);
+------- LABEL 1
+------- LABEL 2
+//	foo(a,b,c,d);
+//	foo(b,a,c,d);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a1,&d1
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*y = z` and `*w = t`, where `y` is `c` and `z` is `d` in `bar`. Since `c` and `b` both point to `&b1`, `*c` and `*b` may alias, leading to `a1` potentially pointing to `d1`.
+[QUESTION]
+Analyze whether pointer expression b1 and pointer expression a1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+void foo(int **w,int**x,int **y, int *z){
+	int *t;
+	*y = z;
+	t = *x;
+	*w = t;
+
+}
+
+void bar(int **p1,int**p2,int **p3, int *p4){
+	foo(p1,p2,p3,p4);
+}
+
+int main(){
+
+	int **a,**b,**c,*d,*a1,*b1,*c1,d1;
+	a = &a1;
+	b = &b1;
+	c = &b1;
+	d = &d1;
+	bar(a,b,c,d);
+------- LABEL 1
+------- LABEL 2
+//	foo(a,b,c,d);
+//	foo(b,a,c,d);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b1,a1
+2. RESULT: MAY
+3. REASON: The pointers b1 and a1 may alias because both are indirectly assigned through the same pointer b in the function foo, which is called with b and c pointing to the same memory location.

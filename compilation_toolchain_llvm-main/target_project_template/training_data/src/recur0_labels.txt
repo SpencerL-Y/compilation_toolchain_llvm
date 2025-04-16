@@ -1,0 +1,3 @@
+LABEL 1,x,&y,MUST
+LABEL 2,x,&z,MUST
+LABEL 3,x,&y,NO

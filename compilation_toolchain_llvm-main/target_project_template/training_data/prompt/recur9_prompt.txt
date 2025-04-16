@@ -1,0 +1,158 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &z alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int z;
+void foo(int **a);
+void bar(int **q){
+    int** a = malloc(10);
+    foo(a);
+}
+
+void foo(int **a){
+    if(z>5) return;
+    z++;
+    *a = &z;
+    bar(a);
+}
+
+
+
+
+int main(){
+    int** a,*b,*c,b1,c1;
+    b = &b1;
+    a = &b;
+    foo(a);
+------- LABEL 1
+------- LABEL 2
+    a = &c;
+    foo(a);
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: b,&z
+2. RESULT: MAY
+3. REASON: The pointer `b` is assigned the address of `b1`, and `a` is assigned the address of `b`. In the function `foo`, `*a` is assigned the address of `z`, which means `b` may point to `z` through the indirect assignment path.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &b1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int z;
+void foo(int **a);
+void bar(int **q){
+    int** a = malloc(10);
+    foo(a);
+}
+
+void foo(int **a){
+    if(z>5) return;
+    z++;
+    *a = &z;
+    bar(a);
+}
+
+
+
+
+int main(){
+    int** a,*b,*c,b1,c1;
+    b = &b1;
+    a = &b;
+    foo(a);
+------- LABEL 1
+------- LABEL 2
+    a = &c;
+    foo(a);
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,&b1
+2. RESULT: MUST
+3. REASON: After the assignment `b = ADDRESS_OF[&b1];` in the `main` function, pointer `b` is directly assigned the address of `b1`, ensuring that `b` and `&b1` always point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &z alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int z;
+void foo(int **a);
+void bar(int **q){
+    int** a = malloc(10);
+    foo(a);
+}
+
+void foo(int **a){
+    if(z>5) return;
+    z++;
+    *a = &z;
+    bar(a);
+}
+
+
+
+
+int main(){
+    int** a,*b,*c,b1,c1;
+    b = &b1;
+    a = &b;
+    foo(a);
+------- LABEL 1
+------- LABEL 2
+    a = &c;
+    foo(a);
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,&z
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned the address of `z` through the indirect assignment in the recursive function `foo`, which modifies the location pointed to by `a` to `&z`. Since `a` can be assigned to `c` in the main function, `c` may point to `&z` after the execution of `foo`.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &c1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int z;
+void foo(int **a);
+void bar(int **q){
+    int** a = malloc(10);
+    foo(a);
+}
+
+void foo(int **a){
+    if(z>5) return;
+    z++;
+    *a = &z;
+    bar(a);
+}
+
+
+
+
+int main(){
+    int** a,*b,*c,b1,c1;
+    b = &b1;
+    a = &b;
+    foo(a);
+------- LABEL 1
+------- LABEL 2
+    a = &c;
+    foo(a);
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,&c1
+2. RESULT: NO
+3. REASON: Pointer `c` is never assigned the address of `c1`, and `c1` is a distinct variable from `c`, ensuring they never point to the same location.

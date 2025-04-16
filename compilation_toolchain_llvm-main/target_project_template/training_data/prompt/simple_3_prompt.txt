@@ -1,0 +1,62 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *p and pointer expression *q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int **p, **q;
+	int *x, *y;
+	int x0, y0;
+	p = &x;
+	q = &y;
+	*p = &x0;
+	*q = &y0;
+------- LABEL 1
+	*p = *q;
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: *p,*q
+2. RESULT: MAY
+3. REASON: After the assignment at LABEL 1, *p and *q may alias because *p is assigned the value of *q, which means they could potentially point to the same address depending on the runtime values of x0 and y0.
+[QUESTION]
+Analyze whether pointer expression *p and pointer expression *q alias in the following program at the position with "------- LABEL 2":
+/*
+ * Simple program to test flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int **p, **q;
+	int *x, *y;
+	int x0, y0;
+	p = &x;
+	q = &y;
+	*p = &x0;
+	*q = &y0;
+------- LABEL 1
+	*p = *q;
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: *p,*q
+2. RESULT: MAY
+3. REASON: After the assignment at LABEL 1, *p and *q may point to the same location because *p is assigned the value of *q, creating a potential aliasing situation.

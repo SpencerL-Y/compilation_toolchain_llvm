@@ -1,0 +1,92 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression c and pointer expression d alias in the following program at the position with "------- LABEL 1":
+/*
+ * Simple alias check
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+int main()
+{
+	int a,b,*c,*d;
+	c = &a;
+	d = &a;
+------- LABEL 1
+	c = &b;
+	// In LLVM, every declared variable is address-taken 
+	// accessed via pointers through loads/stores
+	// c here is loaded from the same memory on LLVM's partial SSA form
+------- LABEL 2
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,d
+2. RESULT: MAY
+3. REASON: Initially, both c and d are assigned the address of 'a', making them MUST alias. However, c is later reassigned to the address of 'b', creating uncertainty in their aliasing relationship. Since there are multiple execution paths and the reassignment of c could occur, c and d MAY alias.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression d alias in the following program at the position with "------- LABEL 2":
+/*
+ * Simple alias check
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+int main()
+{
+	int a,b,*c,*d;
+	c = &a;
+	d = &a;
+------- LABEL 1
+	c = &b;
+	// In LLVM, every declared variable is address-taken 
+	// accessed via pointers through loads/stores
+	// c here is loaded from the same memory on LLVM's partial SSA form
+------- LABEL 2
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,d
+2. RESULT: MAY
+3. REASON: Initially, both c and d are assigned the address of 'a', making them MUST alias. However, c is later reassigned to the address of 'b', while d remains pointing to 'a'. Since there is no further information about the execution path between LABEL 1 and LABEL 2, c and d MAY alias depending on the execution path taken.
+[QUESTION]
+Analyze whether pointer expression &b and pointer expression d alias in the following program at the position with "------- LABEL 3":
+/*
+ * Simple alias check
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+int main()
+{
+	int a,b,*c,*d;
+	c = &a;
+	d = &a;
+------- LABEL 1
+	c = &b;
+	// In LLVM, every declared variable is address-taken 
+	// accessed via pointers through loads/stores
+	// c here is loaded from the same memory on LLVM's partial SSA form
+------- LABEL 2
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: &b,d
+2. RESULT: MAY
+3. REASON: Pointer `d` is assigned the address of `a`, but `c` is later reassigned to the address of `b`. Since `d` is not reassigned after `c` is changed, `d` may still point to `a` or could potentially point to `b` if there are other indirect assignments not visible in the current code snippet. Thus, conservatively, `d` may alias with `&b`.

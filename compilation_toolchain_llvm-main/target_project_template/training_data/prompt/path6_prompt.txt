@@ -1,0 +1,126 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &c alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+int main(){
+    int **p,*q;
+    int *a,*b,c,d;
+    if(a){
+        p = &a;
+        q = &c;
+    }
+    else if(b) {
+        p = &b;
+        q = &d;
+    }
+    else{
+      printf("dummy branch\n");
+    }
+    *p = q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: a,&c
+2. RESULT: MAY
+3. REASON: Depending on the execution path, pointer `a` may be assigned the address of `c` through the indirect assignment `*p = q` when `p` points to `a` and `q` points to `&c`.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &d alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+int main(){
+    int **p,*q;
+    int *a,*b,c,d;
+    if(a){
+        p = &a;
+        q = &c;
+    }
+    else if(b) {
+        p = &b;
+        q = &d;
+    }
+    else{
+      printf("dummy branch\n");
+    }
+    *p = q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: b,&d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, if the condition `else if(b)` is true, `p` is assigned the address of `b` and `q` is assigned the address of `d`, making `*p = q` potentially point `b` to `&d`.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &d alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+int main(){
+    int **p,*q;
+    int *a,*b,c,d;
+    if(a){
+        p = &a;
+        q = &c;
+    }
+    else if(b) {
+        p = &b;
+        q = &d;
+    }
+    else{
+      printf("dummy branch\n");
+    }
+    *p = q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,&d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `*p` could be assigned to `&d` if `b` is true, leading to a potential alias between `a` and `&d`.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &c alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+int main(){
+    int **p,*q;
+    int *a,*b,c,d;
+    if(a){
+        p = &a;
+        q = &c;
+    }
+    else if(b) {
+        p = &b;
+        q = &d;
+    }
+    else{
+      printf("dummy branch\n");
+    }
+    *p = q;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,&c
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `b` may be assigned to `p` and `q` may be assigned to `&c`, leading to a potential aliasing relationship between `b` and `&c` through the indirect assignment `*p = q`.

@@ -1,0 +1,78 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x2 and pointer expression y2 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Cycle
+ * Author: Sen Ye
+ * Date: 11/10/2013
+ */
+#include "aliascheck.h"
+
+int main() {
+	int **x1, **y1, **z1;
+	int *x2, *y2, *z2, *y2_;
+	int x3, y3, z3, y3_;
+	x2 = &x3, y2 = &y3, z2 = &z3;
+	x1 = &x2, y1 = &y2, z1 = &z2;
+	// if the following branch is commented out,
+	// the first alias check will fail while
+	// the second one is OK.
+	if (y3_) {
+		y1 = &y2_;
+		y2_ = &y3_;
+	}
+	*x1 = *y1;
+	*y1 = *z1;
+	*z1 = *x1;
+	// there should be a cycle from
+	// y2 -> x2 -> z2 -> y2
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x2,y2
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment and subsequent indirect assignments, x2 and y2 could potentially point to the same address, depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression z2 and pointer expression x2 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Cycle
+ * Author: Sen Ye
+ * Date: 11/10/2013
+ */
+#include "aliascheck.h"
+
+int main() {
+	int **x1, **y1, **z1;
+	int *x2, *y2, *z2, *y2_;
+	int x3, y3, z3, y3_;
+	x2 = &x3, y2 = &y3, z2 = &z3;
+	x1 = &x2, y1 = &y2, z1 = &z2;
+	// if the following branch is commented out,
+	// the first alias check will fail while
+	// the second one is OK.
+	if (y3_) {
+		y1 = &y2_;
+		y2_ = &y3_;
+	}
+	*x1 = *y1;
+	*y1 = *z1;
+	*z1 = *x1;
+	// there should be a cycle from
+	// y2 -> x2 -> z2 -> y2
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: z2,x2
+2. RESULT: MAY
+3. REASON: Due to the indirect assignments and conditional execution paths, z2 and x2 could potentially point to the same address, especially considering the assignments through **x1, **y1, and **z1.

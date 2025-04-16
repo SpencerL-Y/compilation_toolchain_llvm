@@ -1,0 +1,78 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression b alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+void foo(int ***,int**);
+int obj;
+int main(){
+
+    int ***p,**q, **a, **b, *c, *m,*n,d;
+    m = &d;
+    a = b = &c;
+    if(a){
+        p = &a;
+        q = &c;
+        foo(p,q);
+    }
+    else{
+        p = &b;
+        q = &c;
+        foo(p,q);
+    }
+
+   *a = m;
+   n = *b;
+------- LABEL 1
+------- LABEL 2
+}
+
+void foo(int ***x,int **y){
+    *x = y;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,b
+2. RESULT: MUST
+3. REASON: Both pointers `a` and `b` are initialized to point to the same memory location `&c`, and there are no further assignments that change this relationship.
+[QUESTION]
+Analyze whether pointer expression m and pointer expression n alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+void foo(int ***,int**);
+int obj;
+int main(){
+
+    int ***p,**q, **a, **b, *c, *m,*n,d;
+    m = &d;
+    a = b = &c;
+    if(a){
+        p = &a;
+        q = &c;
+        foo(p,q);
+    }
+    else{
+        p = &b;
+        q = &c;
+        foo(p,q);
+    }
+
+   *a = m;
+   n = *b;
+------- LABEL 1
+------- LABEL 2
+}
+
+void foo(int ***x,int **y){
+    *x = y;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: m,n
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*x = y`, which makes `*a` and `c` alias. Since `*a = m` and `n = *b`, and `a` and `b` alias with `c`, `m` and `n` may alias.

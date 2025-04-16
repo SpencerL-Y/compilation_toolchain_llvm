@@ -1,0 +1,64 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Branches for testing flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q;
+	int x, y;
+	q = &y;
+	if (x) {
+		p = &x;
+------- LABEL 1
+	}
+	else {
+		p = &y;
+------- LABEL 2
+	}
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path, p may point to either the address of x or the address of y, while q always points to the address of y. Thus, p and q may alias when p points to the address of y.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 2":
+/*
+ * Branches for testing flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int *p, *q;
+	int x, y;
+	q = &y;
+	if (x) {
+		p = &x;
+------- LABEL 1
+	}
+	else {
+		p = &y;
+------- LABEL 2
+	}
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path, p may point to either &x or &y, while q points to &y, leading to a potential alias when p points to &y.

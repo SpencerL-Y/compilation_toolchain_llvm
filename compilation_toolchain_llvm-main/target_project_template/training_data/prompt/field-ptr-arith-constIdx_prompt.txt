@@ -1,0 +1,35 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *p and pointer expression &b alias in the following program at the position with "------- LABEL 1":
+/*
+ * Pointer arithmetic
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct s {
+	int* f1;
+	int* f2;
+};
+
+int main()
+{
+	int **q, **p;
+	int a,b;
+	struct s s1;
+	s1.f1 = &a;
+	s1.f2 = &b;
+	q = &(s1.f1);
+	p = q+1;
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: *p,&b
+2. RESULT: MAY
+3. REASON: Pointer *p is derived from q, which points to s1.f1, and p is incremented by 1, potentially pointing to s1.f2, which is assigned the address of &b.
