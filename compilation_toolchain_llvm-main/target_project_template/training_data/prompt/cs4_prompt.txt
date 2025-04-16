@@ -1,0 +1,188 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &d alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&d
+2. RESULT: MAY
+3. REASON: In the function `foo`, `*y` is assigned the value of `w`, which is `&d` in the first call. Since `b` is assigned the value of `*y`, it may point to `&d` depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &a1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,&a1
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned the value of `t`, which is assigned the value of `*x`. In the first call to `foo`, `*x` is `a`, which is initialized to point to `&a1`, so `c` may point to `&a1`.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &r alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,&r
+2. RESULT: MAY
+3. REASON: In the second call to `foo`, `*y` is assigned `w`, and `*z` is assigned `*x`. Since `p` is passed as both `x` and `y`, and `q` is passed as `z`, `p` and `&r` may alias if `w` is `&r`.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: In the second call to `foo`, both `p` and `q` are passed as arguments, and due to the assignments within `foo`, they may end up pointing to the same location depending on the runtime values of the pointers.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression p alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,p
+2. RESULT: MAY
+3. REASON: Both b and p are assigned values through the function `foo`, and since `foo` is called with `ADDRESS_OF[&p]` for both `x` and `y` in the second call, b and p may point to the same location due to potential aliasing through indirect assignments.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression p alias in the following program at the position with "------- LABEL 6":
+#include "aliascheck.h"
+void foo(int **x,int**y,int **z, int *w){
+	int *t;
+	*y = w;
+	t = *x;
+	*z = t;
+
+}
+
+int main(){
+
+	int *a,*b,*c,d,*p,*q,r,a1;
+    a = &a1;
+	foo(&a,&b,&c,&d);
+------- LABEL 1
+------- LABEL 2
+	foo(&p,&p,&q,&r);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,p
+2. RESULT: MAY
+3. REASON: Both c and p are assigned values through the function foo, which can potentially make them point to the same memory location depending on the runtime values of the pointers passed to foo.

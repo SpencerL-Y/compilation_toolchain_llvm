@@ -1,0 +1,54 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression void* and pointer expression void* alias in the following program at the position with "------- LABEL 1":
+------- LABEL 1
+struct innerStruct{
+int m;
+int* n;
+};
+struct myStruct{
+float a;
+struct innerStruct b;
+};
+
+int main(){
+  struct myStruct x;
+  x.b.n = malloc(10);
+  struct myStruct y;
+  memcpy(&y,&x,sizeof(struct myStruct));
+------- LABEL 2
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x.b.n, y.b.n
+2. RESULT: MAY
+3. REASON: After the memcpy operation, the pointer y.b.n may point to the same memory location as x.b.n, as memcpy copies the entire contents of x into y, including the pointer value.
+[QUESTION]
+Analyze whether pointer expression x.b.n and pointer expression y.b.n alias in the following program at the position with "------- LABEL 2":
+------- LABEL 1
+struct innerStruct{
+int m;
+int* n;
+};
+struct myStruct{
+float a;
+struct innerStruct b;
+};
+
+int main(){
+  struct myStruct x;
+  x.b.n = malloc(10);
+  struct myStruct y;
+  memcpy(&y,&x,sizeof(struct myStruct));
+------- LABEL 2
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x.b.n,y.b.n
+2. RESULT: MAY
+3. REASON: The memcpy operation copies the entire contents of struct x to struct y, including the pointer x.b.n, making y.b.n potentially point to the same memory location as x.b.n.

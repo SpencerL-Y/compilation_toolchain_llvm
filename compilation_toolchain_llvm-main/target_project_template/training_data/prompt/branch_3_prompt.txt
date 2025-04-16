@@ -1,0 +1,104 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Branches for testing flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int **p, **q;
+	int *x, *y;
+	int x0, y0;
+	if (x0) {
+		p = &x;
+		q = &y;
+------- LABEL 1
+	}
+	else {
+		p = &y;
+		q = &x;
+------- LABEL 2
+	}
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path, p and q may point to the same address, as they are assigned to the addresses of x and y in different orders based on the condition.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 2":
+/*
+ * Branches for testing flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int **p, **q;
+	int *x, *y;
+	int x0, y0;
+	if (x0) {
+		p = &x;
+		q = &y;
+------- LABEL 1
+	}
+	else {
+		p = &y;
+		q = &x;
+------- LABEL 2
+	}
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path, p and q may point to the same address, as they are assigned addresses of x and y in different orders based on the condition.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 3":
+/*
+ * Branches for testing flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+int main() {
+	int **p, **q;
+	int *x, *y;
+	int x0, y0;
+	if (x0) {
+		p = &x;
+		q = &y;
+------- LABEL 1
+	}
+	else {
+		p = &y;
+		q = &x;
+------- LABEL 2
+	}
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: Depending on the execution path taken (either through LABEL 1 or LABEL 2), pointers p and q may point to the same memory location, as they are assigned the addresses of x and y in different orders.

@@ -1,0 +1,41 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Function pointer.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+#include "aliascheck.h"
+
+void func1(int *p, int *q) {
+	// if function pointer solved correctly,
+	// p and q will alias due to CS1
+------- LABEL 1
+	*p = *q;
+}
+
+void (*fp)(int*,int*);
+
+int main() {
+	int x, y;
+	int *m, *n;
+	if (x) {
+		m = &x, n = &x;
+		fp = func1;
+		fp(m,n); // CS1
+	}
+	else {
+		m = &x; n = &y;
+//		func1(m,n); // CS2
+	}
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p,q
+2. RESULT: MAY
+3. REASON: In the function `func1`, pointers `p` and `q` are parameters that can be passed the same address or different addresses depending on the execution path in `main`. If the `if` condition is true, both `m` and `n` point to `&x`, and `func1` is called with `m` and `n`, making `p` and `q` point to the same location. If the `else` condition is executed, `m` points to `&x` and `n` points to `&y`, and `func1` is not called, so `p` and `q` do not alias. Therefore, `p` and `q` may alias depending on the execution path.

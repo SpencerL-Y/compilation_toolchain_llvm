@@ -1,0 +1,154 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &z alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h" 
+int **x, *y;
+int z;
+void f(int **p);
+void main(){
+	x = &y;
+	f(x);
+}
+
+
+void f(int **p){
+	int k;
+	y = &k;
+	if (z){
+		*p = &z;
+------- LABEL 1
+------- LABEL 2
+
+		f(p);
+	}
+	/// y will not alias to &z as the value flow
+	/// of y after it is updated at "*p=&z" will
+	/// flow into f(p) again and then be updated
+	/// by the first statement "y=&k".
+------- LABEL 3
+------- LABEL 4
+
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,&z
+2. RESULT: MAY
+3. REASON: The pointer `y` is assigned the address of `k`, but if `z` is non-zero, `*p` (which is `y` through `x`) is assigned the address of `z`, creating a potential alias between `y` and `&z` depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &k alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h" 
+int **x, *y;
+int z;
+void f(int **p);
+void main(){
+	x = &y;
+	f(x);
+}
+
+
+void f(int **p){
+	int k;
+	y = &k;
+	if (z){
+		*p = &z;
+------- LABEL 1
+------- LABEL 2
+
+		f(p);
+	}
+	/// y will not alias to &z as the value flow
+	/// of y after it is updated at "*p=&z" will
+	/// flow into f(p) again and then be updated
+	/// by the first statement "y=&k".
+------- LABEL 3
+------- LABEL 4
+
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,&k
+2. RESULT: NO
+3. REASON: The pointer y is assigned the address of k, but then it is reassigned to the address of z within the function f, ensuring y and &k never point to the same location simultaneously.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &z alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h" 
+int **x, *y;
+int z;
+void f(int **p);
+void main(){
+	x = &y;
+	f(x);
+}
+
+
+void f(int **p){
+	int k;
+	y = &k;
+	if (z){
+		*p = &z;
+------- LABEL 1
+------- LABEL 2
+
+		f(p);
+	}
+	/// y will not alias to &z as the value flow
+	/// of y after it is updated at "*p=&z" will
+	/// flow into f(p) again and then be updated
+	/// by the first statement "y=&k".
+------- LABEL 3
+------- LABEL 4
+
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,&z
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the address of a local variable k, but within the function f, if the condition (z) is true, *p (which is y) is assigned the address of z, creating a potential aliasing situation.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &k alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h" 
+int **x, *y;
+int z;
+void f(int **p);
+void main(){
+	x = &y;
+	f(x);
+}
+
+
+void f(int **p){
+	int k;
+	y = &k;
+	if (z){
+		*p = &z;
+------- LABEL 1
+------- LABEL 2
+
+		f(p);
+	}
+	/// y will not alias to &z as the value flow
+	/// of y after it is updated at "*p=&z" will
+	/// flow into f(p) again and then be updated
+	/// by the first statement "y=&k".
+------- LABEL 3
+------- LABEL 4
+
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: y,&k
+2. RESULT: NO
+3. REASON: The pointer y is assigned the address of k, but then y is reassigned to point to a different location (&z) within the function f, ensuring y and &k never point to the same location simultaneously.

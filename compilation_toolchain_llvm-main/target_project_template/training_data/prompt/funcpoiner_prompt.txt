@@ -1,0 +1,138 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression y and pointer expression m alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void f(int** a, int *b)
+{
+ *a = b; 
+}
+
+typedef void (*fp)(int**,int*);
+
+void main()
+{
+        int **x,*y,*z;
+        int *m,*n,m1,n1;
+        m = &m1;
+        n = &n1;
+	fp p = &f;
+	x = &y;
+	(*p)(x,m);       /* these are equivalent */
+------- LABEL 1
+------- LABEL 2
+	x = &z;
+	p(x,n);
+------- LABEL 3
+------- LABEL 4
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,m
+2. RESULT: MAY
+3. REASON: After the function call `(*p)(x,m);` at LABEL 1, `*x` is assigned the value of `m`, making `y` (which `x` initially points to) and `m` potentially alias. However, due to the reassignment of `x` to point to `z` before the second function call, the aliasing is not guaranteed across all execution paths.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression n alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void f(int** a, int *b)
+{
+ *a = b; 
+}
+
+typedef void (*fp)(int**,int*);
+
+void main()
+{
+        int **x,*y,*z;
+        int *m,*n,m1,n1;
+        m = &m1;
+        n = &n1;
+	fp p = &f;
+	x = &y;
+	(*p)(x,m);       /* these are equivalent */
+------- LABEL 1
+------- LABEL 2
+	x = &z;
+	p(x,n);
+------- LABEL 3
+------- LABEL 4
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,n
+2. RESULT: MAY
+3. REASON: The function `f` assigns `*a = b`, which means `*x = m` at LABEL 1, potentially making `y` point to `m`. At LABEL 3, `*x = n` could make `z` point to `n`. Since `x` is reassigned to `z` before LABEL 3, `y` and `n` may alias if the function `f` is called with `x` pointing to `y` and then `z` pointing to `n`.
+[QUESTION]
+Analyze whether pointer expression z and pointer expression n alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+void f(int** a, int *b)
+{
+ *a = b; 
+}
+
+typedef void (*fp)(int**,int*);
+
+void main()
+{
+        int **x,*y,*z;
+        int *m,*n,m1,n1;
+        m = &m1;
+        n = &n1;
+	fp p = &f;
+	x = &y;
+	(*p)(x,m);       /* these are equivalent */
+------- LABEL 1
+------- LABEL 2
+	x = &z;
+	p(x,n);
+------- LABEL 3
+------- LABEL 4
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: z,n
+2. RESULT: MAY
+3. REASON: The function `f` assigns the value of `b` to `*a`, and since `x` is reassigned to point to `z` before the second call to `f`, `z` may be assigned the value of `n`, leading to a potential alias between `z` and `n`.
+[QUESTION]
+Analyze whether pointer expression z and pointer expression m alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+void f(int** a, int *b)
+{
+ *a = b; 
+}
+
+typedef void (*fp)(int**,int*);
+
+void main()
+{
+        int **x,*y,*z;
+        int *m,*n,m1,n1;
+        m = &m1;
+        n = &n1;
+	fp p = &f;
+	x = &y;
+	(*p)(x,m);       /* these are equivalent */
+------- LABEL 1
+------- LABEL 2
+	x = &z;
+	p(x,n);
+------- LABEL 3
+------- LABEL 4
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: z,m
+2. RESULT: NO
+3. REASON: The pointer `z` is assigned to `x` after `x` is assigned to `y`, and `m` is assigned to `*x` through the function call `(*p)(x,m)`. Since `x` is reassigned to point to `z` only after the function call that assigns `m` to `*x`, `z` and `m` never point to the same memory location.

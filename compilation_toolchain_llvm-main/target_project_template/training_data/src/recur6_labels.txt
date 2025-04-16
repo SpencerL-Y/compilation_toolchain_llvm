@@ -1,0 +1,4 @@
+LABEL 1,x,&z,MUST
+LABEL 2,x,&y,NO
+LABEL 3,x,&z,MAY
+LABEL 4,x,&y,MAY

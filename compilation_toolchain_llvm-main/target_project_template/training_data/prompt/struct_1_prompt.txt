@@ -1,0 +1,110 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s1.f1 and pointer expression s1.f2 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s1, s2;
+	int x, y;
+	s1.f1 = &x;
+	s1.f2 = &y;
+	s2.f1 = &y;
+	s2.f2 = &x;
+------- LABEL 1
+------- LABEL 2
+
+	s1.f1 = &y;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s1.f1,s1.f2
+2. RESULT: NO
+3. REASON: Different fields in the same struct instance never alias.
+[QUESTION]
+Analyze whether pointer expression s1.f1 and pointer expression s2.f1 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s1, s2;
+	int x, y;
+	s1.f1 = &x;
+	s1.f2 = &y;
+	s2.f1 = &y;
+	s2.f2 = &x;
+------- LABEL 1
+------- LABEL 2
+
+	s1.f1 = &y;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s1.f1,s2.f1
+2. RESULT: MAY
+3. REASON: Initially, s1.f1 points to &x and s2.f1 points to &y, but after the assignment at LABEL 3, s1.f1 is updated to point to &y, which is the same location as s2.f1, creating a potential aliasing scenario.
+[QUESTION]
+Analyze whether pointer expression s1.f1 and pointer expression s2.f1 alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct alias in flow-sensitive analysis.
+ * Author: Sen Ye
+ * Date: 08/11/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int *f1;
+	int *f2;
+};
+
+int main() {
+	struct MyStruct s1, s2;
+	int x, y;
+	s1.f1 = &x;
+	s1.f2 = &y;
+	s2.f1 = &y;
+	s2.f2 = &x;
+------- LABEL 1
+------- LABEL 2
+
+	s1.f1 = &y;
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: s1.f1,s2.f1
+2. RESULT: MAY
+3. REASON: Initially, s1.f1 points to &x and s2.f1 points to &y, but after the assignment at LABEL 3, s1.f1 is updated to point to &y, which is the same location as s2.f1, creating a potential aliasing scenario.

@@ -1,0 +1,143 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p_data1 and pointer expression p_data2 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Heap
+ * Author: Sen Ye
+ * Date: 15/10/2013
+ * Description: heap objects are identified according to their
+ *		allocation sites.
+ */
+#include "aliascheck.h"
+
+struct Node {
+	int *data;
+	struct Node *next;
+};
+
+// return two malloc object
+void malloc_list(struct Node *p, int num) {
+	int *p_data1=NULL, *p_data2=NULL;
+	struct Node *p_next = NULL;
+    p->data = NULL;
+	while (num!=0) {
+		p->data = (int *) malloc(sizeof(int));
+		p_data1 = p->data;
+	    p_next = (struct Node*) malloc(sizeof(struct Node));
+		p->next = p_next;
+		p_data2 = p->data;
+        num--;
+	}
+------- LABEL 1
+------- LABEL 2
+}
+
+int main() {
+	struct Node* head = (struct Node*) malloc(sizeof(struct Node));
+	int num = 4;
+	malloc_list(head, num);
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p_data1,p_data2
+2. RESULT: MAY
+3. REASON: Both p_data1 and p_data2 are assigned to the same field `p->data` in different iterations of the loop, which may point to the same memory location due to dynamic memory allocation and potential reuse of freed memory.
+[QUESTION]
+Analyze whether pointer expression p_next and pointer expression p_data1 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Heap
+ * Author: Sen Ye
+ * Date: 15/10/2013
+ * Description: heap objects are identified according to their
+ *		allocation sites.
+ */
+#include "aliascheck.h"
+
+struct Node {
+	int *data;
+	struct Node *next;
+};
+
+// return two malloc object
+void malloc_list(struct Node *p, int num) {
+	int *p_data1=NULL, *p_data2=NULL;
+	struct Node *p_next = NULL;
+    p->data = NULL;
+	while (num!=0) {
+		p->data = (int *) malloc(sizeof(int));
+		p_data1 = p->data;
+	    p_next = (struct Node*) malloc(sizeof(struct Node));
+		p->next = p_next;
+		p_data2 = p->data;
+        num--;
+	}
+------- LABEL 1
+------- LABEL 2
+}
+
+int main() {
+	struct Node* head = (struct Node*) malloc(sizeof(struct Node));
+	int num = 4;
+	malloc_list(head, num);
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p_next,p_data1
+2. RESULT: NO
+3. REASON: Different struct fields (p->next and p->data) never alias due to field sensitivity.
+[QUESTION]
+Analyze whether pointer expression head->next->data and pointer expression head->next->next alias in the following program at the position with "------- LABEL 3":
+/*
+ * Heap
+ * Author: Sen Ye
+ * Date: 15/10/2013
+ * Description: heap objects are identified according to their
+ *		allocation sites.
+ */
+#include "aliascheck.h"
+
+struct Node {
+	int *data;
+	struct Node *next;
+};
+
+// return two malloc object
+void malloc_list(struct Node *p, int num) {
+	int *p_data1=NULL, *p_data2=NULL;
+	struct Node *p_next = NULL;
+    p->data = NULL;
+	while (num!=0) {
+		p->data = (int *) malloc(sizeof(int));
+		p_data1 = p->data;
+	    p_next = (struct Node*) malloc(sizeof(struct Node));
+		p->next = p_next;
+		p_data2 = p->data;
+        num--;
+	}
+------- LABEL 1
+------- LABEL 2
+}
+
+int main() {
+	struct Node* head = (struct Node*) malloc(sizeof(struct Node));
+	int num = 4;
+	malloc_list(head, num);
+------- LABEL 3
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: head->next->data,head->next->next
+2. RESULT: MAY
+3. REASON: The pointers head->next->data and head->next->next may alias because they are fields within different struct instances created in a loop, and the same field in different struct instances may alias due to conservative analysis of dynamic memory allocation.

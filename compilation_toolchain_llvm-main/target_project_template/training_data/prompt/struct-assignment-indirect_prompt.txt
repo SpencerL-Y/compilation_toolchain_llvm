@@ -1,0 +1,70 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p1->a and pointer expression s2.a alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias due to struct assignment
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct s{
+	int *a;
+	int *b;
+};
+
+int main()
+{
+	struct s s1, s2;
+	struct s * p1;
+	int x, y;
+	s1.a = &x;
+	s1.b = &y;
+	s2 = s1;
+	p1 = &s1;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p1->a,s2.a
+2. RESULT: MAY
+3. REASON: The struct s2 is assigned the values of s1, making s2.a point to the same location as s1.a, and since p1 is a pointer to s1, p1->a also points to the same location as s1.a, leading to a potential aliasing between p1->a and s2.a.
+[QUESTION]
+Analyze whether pointer expression p1->b and pointer expression s2.b alias in the following program at the position with "------- LABEL 2":
+/*
+ * Alias due to struct assignment
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct s{
+	int *a;
+	int *b;
+};
+
+int main()
+{
+	struct s s1, s2;
+	struct s * p1;
+	int x, y;
+	s1.a = &x;
+	s1.b = &y;
+	s2 = s1;
+	p1 = &s1;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: p1->b,s2.b
+2. RESULT: MAY
+3. REASON: Since s2 is assigned the value of s1, s2.b and s1.b point to the same location, and p1->b points to s1.b, they may alias.

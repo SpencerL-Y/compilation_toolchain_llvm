@@ -1,0 +1,2 @@
+LABEL 1,x2,y2,MAY
+LABEL 2,z2,x2,MAY

@@ -1,0 +1,48 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &c alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+int main(){
+
+  int **a, *b, *x ,c;
+  c = 10;
+  a = &b;
+  b = &c;
+  x = *a;
+  int y = *x;
+------- LABEL 1
+------- LABEL 2
+  return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,&c
+2. RESULT: MUST
+3. REASON: Pointer x is assigned the value of *a, which is &c through the sequence of assignments, ensuring x always points to the same location as &c.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression b alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+int main(){
+
+  int **a, *b, *x ,c;
+  c = 10;
+  a = &b;
+  b = &c;
+  x = *a;
+  int y = *x;
+------- LABEL 1
+------- LABEL 2
+  return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,b
+2. RESULT: MUST
+3. REASON: Pointer x is assigned the value of *a, which is b, making x and b point to the same memory location.

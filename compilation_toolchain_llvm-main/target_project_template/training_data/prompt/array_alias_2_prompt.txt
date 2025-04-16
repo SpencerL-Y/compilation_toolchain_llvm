@@ -1,0 +1,290 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f1 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f1
+2. RESULT: MAY
+3. REASON: Different struct array elements' fields may alias due to potential runtime index overlap and conditional assignments.
+[QUESTION]
+Analyze whether pointer expression p[0] and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p[0],s[1].f2
+2. RESULT: MAY
+3. REASON: Both p[0] and s[1].f2 are assigned the address of &c, and due to the conditional assignment of s[1].f1 to &c, there is a potential overlap in the memory locations they point to.
+[QUESTION]
+Analyze whether pointer expression s[0].f3 and pointer expression &y alias in the following program at the position with "------- LABEL 3":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s[0].f3,&y
+2. RESULT: NO
+3. REASON: Different struct fields never alias, and s[0].f3 is assigned to &x, not &y.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 4":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f2
+2. RESULT: NO
+3. REASON: Different fields in a struct never alias due to field sensitivity, and s[0].f1 and s[1].f2 are different fields.
+[QUESTION]
+Analyze whether pointer expression p[1] and pointer expression s[1].f1 alias in the following program at the position with "------- LABEL 5":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: p[1],s[1].f1
+2. RESULT: MAY
+3. REASON: The pointer s[1].f1 is conditionally assigned the address of &c, which is also the address assigned to p[0], and since p[1] is assigned the address of &d, there is no direct assignment between p[1] and s[1].f1. However, due to the conditional assignment and the possibility of array elements aliasing, p[1] and s[1].f1 may alias if the condition is not met and s[1].f1 retains its initial assignment.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 6":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+	float * f3;
+};
+
+int main() {
+	struct MyStruct s[3];
+	int * p[2];
+	int a,b,c,d;
+	float x,y;
+	s[0].f1 = &a, s[0].f2 = &c, s[0].f3 = &x;
+	s[1].f1 = &b, s[1].f2 = &d, s[1].f3 = &y;
+	p[0] = &c, p[1] = &d;
+
+	// Same fields of different elements in a certain
+	// array are treated as one object.
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 4
+------- LABEL 5
+
+	if (a)
+		s[1].f1 = &c;
+------- LABEL 6
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f2
+2. RESULT: NO
+3. REASON: Different fields in a struct never alias due to field sensitivity.

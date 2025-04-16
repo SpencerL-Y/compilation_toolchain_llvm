@@ -1,0 +1,7 @@
+LABEL 1,x,z,MUST
+LABEL 2,y,&obj,MUST
+LABEL 3,w,k,NO
+LABEL 4,w,&obj,MAY
+LABEL 5,x,w,NO
+LABEL 6,z,k,NO
+LABEL 7,y,w,MAY

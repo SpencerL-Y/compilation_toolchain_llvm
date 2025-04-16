@@ -1,0 +1,3 @@
+LABEL 1,p_data1,p_data2,MAY
+LABEL 2,p_next,p_data1,NO
+LABEL 3,head->next->data,head->next->next,NO

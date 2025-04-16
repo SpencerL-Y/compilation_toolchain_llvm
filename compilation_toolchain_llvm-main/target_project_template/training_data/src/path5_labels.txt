@@ -1,0 +1,4 @@
+LABEL 1,obj1.pi,&k1,MAY
+LABEL 2,obj1.pi,&k2,NO
+LABEL 3,obj2.pi,&k2,MAY
+LABEL 4,obj2.pi,&k1,NO

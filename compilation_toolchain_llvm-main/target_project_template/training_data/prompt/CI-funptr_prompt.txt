@@ -1,0 +1,38 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression m and pointer expression n alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias due to function pointer resolution.
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+void f(int *m, int *n)
+{
+------- LABEL 1
+}
+
+typedef void (*fp)(int*m, int*n);
+
+int main()
+{
+	int a,b,c,d;
+	int *pa, *pb;
+    fp p;
+	pa = &a, pb = &b;
+	f(pa, pb);
+    p = f;
+	pb = &a;
+    (*p)(pa, pb); 
+	return 0;
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: m,n
+2. RESULT: MAY
+3. REASON: The function `f` is called twice with different pointer assignments, and during the second call, both `pa` and `pb` point to the same memory location `&a`, making `m` and `n` potentially alias.

@@ -1,0 +1,33 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &a alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int a;
+int *foo(int *x){
+   int*z = x;
+   int* y;
+   if(x)
+    y = foo(z);
+   else
+    y = x;
+
+------- LABEL 1
+    return y;
+
+}
+
+int main(){
+ int*p;
+ p = &a;
+
+ foo(p);
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: y,&a
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the result of foo(z) or x, where x initially points to &a. Due to the recursive nature of foo and conditional assignments, y may potentially point to &a.

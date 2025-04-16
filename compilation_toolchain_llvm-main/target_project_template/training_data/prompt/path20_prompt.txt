@@ -1,0 +1,95 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression obj and pointer expression &q alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int main(){
+
+    int**a,**b, *f,*g,r,w,q,*obj,k;
+    f = &k;
+    if(a){
+        a = &f;
+        f = &r;
+    }
+    else{
+        a = &g;
+        g = &w;
+    }
+    a = b;
+
+    *a = &q;
+    obj = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: obj,&q
+2. RESULT: MUST
+3. REASON: The pointer `*a` is assigned the address of `q`, and since `a` is set to `b`, `*b` also points to `q`. Therefore, `obj`, which is assigned `*b`, must point to the same location as `&q`.
+[QUESTION]
+Analyze whether pointer expression obj and pointer expression &r alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int main(){
+
+    int**a,**b, *f,*g,r,w,q,*obj,k;
+    f = &k;
+    if(a){
+        a = &f;
+        f = &r;
+    }
+    else{
+        a = &g;
+        g = &w;
+    }
+    a = b;
+
+    *a = &q;
+    obj = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: obj,&r
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `obj` may point to the same location as `&r` if the `if(a)` condition is true, leading to `*a` being assigned the address of `q`, which `obj` then points to. However, if the `else` path is taken, `obj` will point to `&w`, not `&r`. Thus, `obj` may alias `&r` in some execution paths.
+[QUESTION]
+Analyze whether pointer expression obj and pointer expression &w alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int main(){
+
+    int**a,**b, *f,*g,r,w,q,*obj,k;
+    f = &k;
+    if(a){
+        a = &f;
+        f = &r;
+    }
+    else{
+        a = &g;
+        g = &w;
+    }
+    a = b;
+
+    *a = &q;
+    obj = *b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: obj,&w
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `obj` may point to `&w` if the `else` branch is taken, where `a` is assigned the address of `g`, and `g` is assigned the address of `w`. Since `a` is then assigned to `b`, and `*a` is assigned the address of `q`, `obj` is assigned `*b`, which could be `&w` if the `else` branch was executed.

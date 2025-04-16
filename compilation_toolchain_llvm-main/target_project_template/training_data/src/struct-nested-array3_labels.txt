@@ -1,0 +1,5 @@
+LABEL 1,&p->out4,&s.out4,MUST
+LABEL 2,&p->out3.mid2[10].in1[10],&s.out3.mid2[4000],MAY
+LABEL 3,&p->out3.mid2[20],&p->out3.mid2[30],MAY
+LABEL 4,&p->out3.mid2[3].in3,&s.out3.mid3[2],NO
+LABEL 5,&p->out3.mid2[0],&s.out4,NO

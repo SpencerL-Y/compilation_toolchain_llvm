@@ -1,0 +1,146 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression pdst->f2 and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct casting.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct SrcStruct {
+	int* f1;
+	int* f2;
+	char f3;
+};
+
+struct DstStruct {
+	char f1;
+	int* f2;
+	int* f3;
+};
+
+int main() {
+	struct DstStruct* pdst;
+	struct SrcStruct* psrc;
+	struct SrcStruct s;
+	int x, y, z;
+
+	psrc = &s;
+	psrc->f1 = &x;
+	psrc->f2 = &y;
+
+	pdst = (struct DstStruct*)psrc;
+
+------- LABEL 1
+------- LABEL 2
+
+	pdst->f3 = &z;
+------- LABEL 3
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: pdst->f2,&x
+2. RESULT: MAY
+3. REASON: pdst->f2 and psrc->f1 may alias because pdst is cast from psrc, and psrc->f1 is assigned the address of x.
+[QUESTION]
+Analyze whether pointer expression pdst->f2 and pointer expression &y alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct casting.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct SrcStruct {
+	int* f1;
+	int* f2;
+	char f3;
+};
+
+struct DstStruct {
+	char f1;
+	int* f2;
+	int* f3;
+};
+
+int main() {
+	struct DstStruct* pdst;
+	struct SrcStruct* psrc;
+	struct SrcStruct s;
+	int x, y, z;
+
+	psrc = &s;
+	psrc->f1 = &x;
+	psrc->f2 = &y;
+
+	pdst = (struct DstStruct*)psrc;
+
+------- LABEL 1
+------- LABEL 2
+
+	pdst->f3 = &z;
+------- LABEL 3
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: pdst->f2,&y
+2. RESULT: MAY
+3. REASON: pdst->f2 and &y may alias because pdst is cast from psrc, and psrc->f2 is assigned the address of y, making pdst->f2 potentially point to the same location as &y due to the struct field overlap.
+[QUESTION]
+Analyze whether pointer expression psrc->f2 and pointer expression &z alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct casting.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct SrcStruct {
+	int* f1;
+	int* f2;
+	char f3;
+};
+
+struct DstStruct {
+	char f1;
+	int* f2;
+	int* f3;
+};
+
+int main() {
+	struct DstStruct* pdst;
+	struct SrcStruct* psrc;
+	struct SrcStruct s;
+	int x, y, z;
+
+	psrc = &s;
+	psrc->f1 = &x;
+	psrc->f2 = &y;
+
+	pdst = (struct DstStruct*)psrc;
+
+------- LABEL 1
+------- LABEL 2
+
+	pdst->f3 = &z;
+------- LABEL 3
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: psrc->f2,&z
+2. RESULT: NO
+3. REASON: Different struct fields never alias, and psrc->f2 is assigned to &y while pdst->f3 is assigned to &z.

@@ -1,0 +1,197 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &a alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+
+int main(){
+
+    int **p,**q;
+    int **x,**y;
+    int *a,*b,*x1,a1,b1;
+    int *m,*n,n1;
+    /// Note that n needs to be initialized
+    n = &n1;
+    a = &a1;
+    b = &b1;
+    x = y = &x1;
+    p = q = &a;
+    if(a){
+        p = x;
+        q = y;
+    }
+
+    *p = n;
+    m = *q;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p,&a
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment, p may point to either the same location as &a or a different location, depending on the runtime value of a.
+[QUESTION]
+Analyze whether pointer expression p and pointer expression &x1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+
+int main(){
+
+    int **p,**q;
+    int **x,**y;
+    int *a,*b,*x1,a1,b1;
+    int *m,*n,n1;
+    /// Note that n needs to be initialized
+    n = &n1;
+    a = &a1;
+    b = &b1;
+    x = y = &x1;
+    p = q = &a;
+    if(a){
+        p = x;
+        q = y;
+    }
+
+    *p = n;
+    m = *q;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p,&x1
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment `p = x` and `x = ADDRESS_OF[&x1]`, `p` may point to the same location as `&x1` depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression m and pointer expression &a1 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+
+int main(){
+
+    int **p,**q;
+    int **x,**y;
+    int *a,*b,*x1,a1,b1;
+    int *m,*n,n1;
+    /// Note that n needs to be initialized
+    n = &n1;
+    a = &a1;
+    b = &b1;
+    x = y = &x1;
+    p = q = &a;
+    if(a){
+        p = x;
+        q = y;
+    }
+
+    *p = n;
+    m = *q;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: m,&a1
+2. RESULT: NO
+3. REASON: Pointer `m` is assigned the value of `*q`, which is set to `n` (address of `n1`), while `&a1` is the address of `a1`, and there is no assignment or path that makes `m` point to `&a1`.
+[QUESTION]
+Analyze whether pointer expression m and pointer expression &x1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+
+int main(){
+
+    int **p,**q;
+    int **x,**y;
+    int *a,*b,*x1,a1,b1;
+    int *m,*n,n1;
+    /// Note that n needs to be initialized
+    n = &n1;
+    a = &a1;
+    b = &b1;
+    x = y = &x1;
+    p = q = &a;
+    if(a){
+        p = x;
+        q = y;
+    }
+
+    *p = n;
+    m = *q;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: m,&x1
+2. RESULT: MAY
+3. REASON: The pointers p and q are conditionally assigned to x and y, which both point to &x1. Since m is assigned the value of *q, and q may point to x (which points to &x1), m may point to &x1 depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression n and pointer expression m alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+
+
+int main(){
+
+    int **p,**q;
+    int **x,**y;
+    int *a,*b,*x1,a1,b1;
+    int *m,*n,n1;
+    /// Note that n needs to be initialized
+    n = &n1;
+    a = &a1;
+    b = &b1;
+    x = y = &x1;
+    p = q = &a;
+    if(a){
+        p = x;
+        q = y;
+    }
+
+    *p = n;
+    m = *q;
+
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: n,m
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment of `p` and `q` to `x` and `y`, `*p` and `*q` may point to the same location, leading to `m` potentially pointing to the same location as `n`.

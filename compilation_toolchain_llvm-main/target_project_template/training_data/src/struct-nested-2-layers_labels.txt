@@ -1,0 +1,3 @@
+LABEL 1,ptmp,pmid,MUST
+LABEL 2,itmp,pin,MUST
+LABEL 3,&pout->out3,pin,NO

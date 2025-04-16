@@ -1,0 +1,3 @@
+LABEL 1,pdst->f2,&x,MAY
+LABEL 2,pdst->f2,&y,MAY
+LABEL 3,psrc->f2,&z,MAY

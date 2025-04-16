@@ -1,0 +1,152 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &a alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void foo(int*,int*);
+main(){
+	int*x, *y;
+	int a,b, c;
+	if(c)x=&a; 
+	else x=&b;
+------- LABEL 1
+------- LABEL 2
+	foo(x,y);
+	x = &c;
+	foo(x,y);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+	
+}
+
+void foo(int *p,int*q){
+	*p = 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x,&a
+2. RESULT: MAY
+3. REASON: Depending on the execution path, x may be assigned the address of either &a or &b, leading to potential aliasing with &a.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &b alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void foo(int*,int*);
+main(){
+	int*x, *y;
+	int a,b, c;
+	if(c)x=&a; 
+	else x=&b;
+------- LABEL 1
+------- LABEL 2
+	foo(x,y);
+	x = &c;
+	foo(x,y);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+	
+}
+
+void foo(int *p,int*q){
+	*p = 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x,&b
+2. RESULT: MAY
+3. REASON: Depending on the execution path, x may be assigned the address of either &a or &b, leading to potential aliasing with &b.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &c alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+void foo(int*,int*);
+main(){
+	int*x, *y;
+	int a,b, c;
+	if(c)x=&a; 
+	else x=&b;
+------- LABEL 1
+------- LABEL 2
+	foo(x,y);
+	x = &c;
+	foo(x,y);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+	
+}
+
+void foo(int *p,int*q){
+	*p = 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,&c
+2. RESULT: NO
+3. REASON: The pointer x is assigned the address of either &a or &b before the first call to foo, and then it is reassigned to &c after the first call to foo. Therefore, x and &c never point to the same memory location at the same time.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &a alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+void foo(int*,int*);
+main(){
+	int*x, *y;
+	int a,b, c;
+	if(c)x=&a; 
+	else x=&b;
+------- LABEL 1
+------- LABEL 2
+	foo(x,y);
+	x = &c;
+	foo(x,y);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+	
+}
+
+void foo(int *p,int*q){
+	*p = 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,&a
+2. RESULT: MAY
+3. REASON: Depending on the execution path, x may be assigned the address of &a, leading to a potential aliasing relationship.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &b alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+void foo(int*,int*);
+main(){
+	int*x, *y;
+	int a,b, c;
+	if(c)x=&a; 
+	else x=&b;
+------- LABEL 1
+------- LABEL 2
+	foo(x,y);
+	x = &c;
+	foo(x,y);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+	
+}
+
+void foo(int *p,int*q){
+	*p = 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,&b
+2. RESULT: MAY
+3. REASON: Depending on the execution path, x may be assigned the address of either &a or &b, leading to a potential alias with &b.

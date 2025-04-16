@@ -1,0 +1,4 @@
+LABEL 1,&p->f3[10],q,MAY
+LABEL 2,&p->f3[20],&p->f3[30],MAY
+LABEL 3,&s.f3[0],&s.f3[99],MAY
+LABEL 4,&p->f3[0],&s.f4,NO

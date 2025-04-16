@@ -1,0 +1,10 @@
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/intrinsics_gen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/vt_gen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/omp_gen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/acc_gen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/ARMTargetParserTableGen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/AArch64TargetParserTableGen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/RISCVTargetParserTableGen.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/main_pass.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/edit_cache.dir
+/home/clexma/Desktop/fox3/llvm_passes/dyn_pass_prj/build/CMakeFiles/rebuild_cache.dir

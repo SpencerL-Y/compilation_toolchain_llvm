@@ -1,0 +1,62 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &ss alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void foo(int*);
+int ss = 20;
+int main(){
+    int *a,*b,obj,t;
+    a=&obj;
+    foo(a);
+    *a=200;
+    b=&t;
+    foo(b);
+------- LABEL 1
+------- LABEL 2
+}
+
+void foo(int* x){
+     static int* k =&ss;
+    printf("%d\n", *k);
+    *k=200;
+    k=x;
+     *x= 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,&ss
+2. RESULT: MAY
+3. REASON: The pointer `k` in `foo` is initially pointing to `&ss`, and then it is assigned the value of `x`, which can be `a` or `b`. Therefore, `a` may point to the same location as `&ss` after the function call.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &ss alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void foo(int*);
+int ss = 20;
+int main(){
+    int *a,*b,obj,t;
+    a=&obj;
+    foo(a);
+    *a=200;
+    b=&t;
+    foo(b);
+------- LABEL 1
+------- LABEL 2
+}
+
+void foo(int* x){
+     static int* k =&ss;
+    printf("%d\n", *k);
+    *k=200;
+    k=x;
+     *x= 100;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,&ss
+2. RESULT: MAY
+3. REASON: The pointer `k` in function `foo` initially points to `&ss`, but it is reassigned to point to `b` when `foo(b)` is called, creating a potential alias between `b` and `&ss`.

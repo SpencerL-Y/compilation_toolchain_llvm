@@ -1,0 +1,70 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f2 alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int a,b;
+	s[0].f1 = &a;
+	s[1].f1 = &b;
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 1
+------- LABEL 2
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f2
+2. RESULT: NO
+3. REASON: Different fields in a struct never alias, and s[1].f2 is uninitialized.
+[QUESTION]
+Analyze whether pointer expression s[0].f1 and pointer expression s[1].f1 alias in the following program at the position with "------- LABEL 2":
+/*
+ * Alias with array
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	int * f2;
+};
+
+int main() {
+	struct MyStruct s[2];
+	int a,b;
+	s[0].f1 = &a;
+	s[1].f1 = &b;
+
+	// Different fields of different elements in a 
+	// certain array are treated as different objects.
+------- LABEL 1
+------- LABEL 2
+
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: s[0].f1,s[1].f1
+2. RESULT: NO
+3. REASON: The pointers s[0].f1 and s[1].f1 are assigned to the addresses of different variables (&a and &b, respectively), and since they are different fields in different struct array elements, they never alias.

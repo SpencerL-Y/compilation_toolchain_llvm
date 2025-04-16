@@ -1,0 +1,33 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression p_local and pointer expression p_global alias in the following program at the position with "------- LABEL 1":
+/*
+ * Context-insensitive.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+
+#include "aliascheck.h"
+
+int global;
+int *p_global;
+
+void foo() {
+	p_global = &global;
+}
+
+int main() {
+	int *p_local;
+	p_local = &global;
+	foo();
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: p_local,p_global
+2. RESULT: MAY
+3. REASON: Both pointers are assigned the address of the same global variable, but the assignment to p_global occurs in a separate function call, which introduces potential execution path variations.

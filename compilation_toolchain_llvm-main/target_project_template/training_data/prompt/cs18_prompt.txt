@@ -1,0 +1,134 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &b alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int obj,b;
+void bar(int **s){
+    *s = &b;
+}
+
+void foo(int **p){
+	*p = &obj;
+	bar(p);
+}
+main(){
+	int **x;
+	int *a, *c;
+	x=&a; 
+	foo(x);
+------- LABEL 1
+------- LABEL 2
+	x = &c;
+	foo(x);
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,&b
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*p` to point to `&obj`, but then `bar` is called with the same pointer `p`, which reassigns `*p` to point to `&b`. Therefore, `a` may point to `&b` after `foo(x)` is called.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &obj alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int obj,b;
+void bar(int **s){
+    *s = &b;
+}
+
+void foo(int **p){
+	*p = &obj;
+	bar(p);
+}
+main(){
+	int **x;
+	int *a, *c;
+	x=&a; 
+	foo(x);
+------- LABEL 1
+------- LABEL 2
+	x = &c;
+	foo(x);
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,&obj
+2. RESULT: MAY
+3. REASON: The pointer `a` is assigned the address of `obj` through the function `foo`, but it is later reassigned to the address of `b` through the function `bar`, making it possible but not certain that `a` points to `obj`.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &b alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int obj,b;
+void bar(int **s){
+    *s = &b;
+}
+
+void foo(int **p){
+	*p = &obj;
+	bar(p);
+}
+main(){
+	int **x;
+	int *a, *c;
+	x=&a; 
+	foo(x);
+------- LABEL 1
+------- LABEL 2
+	x = &c;
+	foo(x);
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: c,&b
+2. RESULT: MAY
+3. REASON: The pointer `c` is assigned through `foo`, which calls `bar` that assigns the address of `b` to the location pointed by `c`, creating a potential alias.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &obj alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int obj,b;
+void bar(int **s){
+    *s = &b;
+}
+
+void foo(int **p){
+	*p = &obj;
+	bar(p);
+}
+main(){
+	int **x;
+	int *a, *c;
+	x=&a; 
+	foo(x);
+------- LABEL 1
+------- LABEL 2
+	x = &c;
+	foo(x);
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,&obj
+2. RESULT: NO
+3. REASON: The pointer `c` is assigned the address of `b` through the function `foo`, which calls `bar` to set the pointer to `b`. Since `&obj` is a different memory location, `c` and `&obj` never point to the same address.

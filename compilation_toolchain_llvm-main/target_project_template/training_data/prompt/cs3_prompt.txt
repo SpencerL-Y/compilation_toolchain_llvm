@@ -1,0 +1,324 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression z alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,z
+2. RESULT: NO
+3. REASON: The pointer `x` is assigned the address of `x1`, and `z` is assigned the address of `z1`. There are no assignments or function calls that could make `x` and `z` point to the same memory location, ensuring they never alias.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &k1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,&k1
+2. RESULT: NO
+3. REASON: The pointer y is assigned the address of y1, while &k1 is the address of k1, and there are no assignments or operations in the program that could make y point to the address of k1.
+[QUESTION]
+Analyze whether pointer expression w and pointer expression g alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: w,g
+2. RESULT: NO
+3. REASON: Pointers w and g are initialized to point to different memory locations (w1 and g1 respectively) and there are no assignments or operations in the program that could cause them to alias.
+[QUESTION]
+Analyze whether pointer expression w and pointer expression &k1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: w,&k1
+2. RESULT: NO
+3. REASON: The pointer `w` is assigned the address of `w1`, and `&k1` is the address of `k1`. Since `w1` and `k1` are distinct variables, `w` and `&k1` never point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression w alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,w
+2. RESULT: NO
+3. REASON: Pointers x and w are initialized to point to different memory locations (x1 and w1 respectively) and there are no assignments or function calls that could make them point to the same location.
+[QUESTION]
+Analyze whether pointer expression z and pointer expression g alias in the following program at the position with "------- LABEL 6":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: z,g
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*r = *p` and `*q = s`, which means `z` and `g` could potentially point to the same location if `s` is assigned to `g` and `*r` is assigned to `z` in different calls to `foo`.
+[QUESTION]
+Analyze whether pointer expression w and pointer expression y alias in the following program at the position with "------- LABEL 7":
+#include "aliascheck.h"
+void foo(int **p, int **q, int **r,int *s){
+
+	*r = *p;
+	*q = s;
+
+}
+
+
+void main(){
+
+	int **a,**b,**c,**d,**e,**f,*x,*y,*z,*w,*g,*k,x1,y1,z1,w1,k1,g1;
+	x = &x1;
+	y = &y1;
+	z = &z1;
+	w = &w1;
+	g = &g1;
+	k = &k1;
+
+	a = &x;
+	b = &y;
+	c = &z;
+
+	foo(a,b,c,k);
+------- LABEL 1
+------- LABEL 2
+	d = &w;
+	e = &w;
+	f = &g;
+	foo(d,e,f,k);
+------- LABEL 3
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: w,y
+2. RESULT: NO
+3. REASON: The pointer `y` is assigned the address of `y1` and `w` is assigned the address of `w1`, and there are no assignments or function calls that could cause `w` and `y` to point to the same memory location.

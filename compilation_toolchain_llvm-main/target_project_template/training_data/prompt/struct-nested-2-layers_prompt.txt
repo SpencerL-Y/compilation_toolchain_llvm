@@ -1,0 +1,179 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression ptmp and pointer expression pmid alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct with nested structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerStruct {
+	int in1;
+	char in2;
+};
+
+struct MidStruct {
+	int mid1;
+	struct InnerStruct mid2;
+	char mid3;
+};
+
+struct OuterStruct {
+	struct MidStruct out1;
+	char out2;
+	struct InnerStruct out3;
+	int out4;
+};
+
+int main() {
+	struct OuterStruct* pout;
+	struct MidStruct* pmid;
+	struct MidStruct* ptmp;
+	struct InnerStruct* itmp;
+	struct InnerStruct* pin;
+	struct OuterStruct s;
+
+	pout = &s;
+	pmid = &s.out1;
+	ptmp = &pout->out1;
+------- LABEL 1
+	MUSTALIAS(&(ptmp->mid2.in1), &(pmid->mid2.in1));
+	MUSTALIAS(&(ptmp->mid2.in2), &(pmid->mid2.in2));
+
+	pin = &s.out1.mid2;
+	itmp = &pout->out1.mid2;
+------- LABEL 2
+	MUSTALIAS(&(itmp->in1), &(pin->in1));
+	MUSTALIAS(&(itmp->in2), &(pin->in2));
+
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: ptmp,pmid
+2. RESULT: MUST
+3. REASON: Both pointers ptmp and pmid are assigned the address of the same struct field s.out1, ensuring they always point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression itmp and pointer expression pin alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct with nested structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerStruct {
+	int in1;
+	char in2;
+};
+
+struct MidStruct {
+	int mid1;
+	struct InnerStruct mid2;
+	char mid3;
+};
+
+struct OuterStruct {
+	struct MidStruct out1;
+	char out2;
+	struct InnerStruct out3;
+	int out4;
+};
+
+int main() {
+	struct OuterStruct* pout;
+	struct MidStruct* pmid;
+	struct MidStruct* ptmp;
+	struct InnerStruct* itmp;
+	struct InnerStruct* pin;
+	struct OuterStruct s;
+
+	pout = &s;
+	pmid = &s.out1;
+	ptmp = &pout->out1;
+------- LABEL 1
+	MUSTALIAS(&(ptmp->mid2.in1), &(pmid->mid2.in1));
+	MUSTALIAS(&(ptmp->mid2.in2), &(pmid->mid2.in2));
+
+	pin = &s.out1.mid2;
+	itmp = &pout->out1.mid2;
+------- LABEL 2
+	MUSTALIAS(&(itmp->in1), &(pin->in1));
+	MUSTALIAS(&(itmp->in2), &(pin->in2));
+
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: itmp,pin
+2. RESULT: MUST
+3. REASON: Both pointers itmp and pin are directly assigned the address of the same struct field s.out1.mid2, ensuring they always point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression &pout->out3 and pointer expression pin alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct with nested structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerStruct {
+	int in1;
+	char in2;
+};
+
+struct MidStruct {
+	int mid1;
+	struct InnerStruct mid2;
+	char mid3;
+};
+
+struct OuterStruct {
+	struct MidStruct out1;
+	char out2;
+	struct InnerStruct out3;
+	int out4;
+};
+
+int main() {
+	struct OuterStruct* pout;
+	struct MidStruct* pmid;
+	struct MidStruct* ptmp;
+	struct InnerStruct* itmp;
+	struct InnerStruct* pin;
+	struct OuterStruct s;
+
+	pout = &s;
+	pmid = &s.out1;
+	ptmp = &pout->out1;
+------- LABEL 1
+	MUSTALIAS(&(ptmp->mid2.in1), &(pmid->mid2.in1));
+	MUSTALIAS(&(ptmp->mid2.in2), &(pmid->mid2.in2));
+
+	pin = &s.out1.mid2;
+	itmp = &pout->out1.mid2;
+------- LABEL 2
+	MUSTALIAS(&(itmp->in1), &(pin->in1));
+	MUSTALIAS(&(itmp->in2), &(pin->in2));
+
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: &pout->out3,pin
+2. RESULT: NO
+3. REASON: Different struct fields, out3 and mid2, never alias due to field sensitivity.

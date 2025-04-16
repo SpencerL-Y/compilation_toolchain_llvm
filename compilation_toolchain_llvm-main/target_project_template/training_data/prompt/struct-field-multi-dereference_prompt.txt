@@ -1,0 +1,35 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression q->f2->f1 and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias due to struct.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+
+#include "aliascheck.h"
+
+struct MyStruct {
+	int * f1;
+	struct MyStruct *f2;
+};
+
+int main() {
+	struct MyStruct *p, *q;
+	struct MyStruct ms1, ms2;
+	int x;
+	p = &ms1;
+	q = &ms1;
+	ms1.f2 = &ms2;
+	p->f2->f1 = &x;
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: q->f2->f1,&x
+2. RESULT: MAY
+3. REASON: q and p are assigned to the same address (&ms1), and p->f2 is assigned &ms2, making q->f2 point to ms2. Since p->f2->f1 is assigned &x, q->f2->f1 may also point to &x.

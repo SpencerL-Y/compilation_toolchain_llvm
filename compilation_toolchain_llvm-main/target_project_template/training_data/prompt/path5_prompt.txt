@@ -1,0 +1,154 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression obj1.pi and pointer expression &k1 alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+struct agg{
+    int*pi;
+    int k;
+}agg;
+
+int main(){
+    int *s,k1,k2;
+    struct agg *a,*b, obj1,obj2;
+    /// Note that, all pointers should be properly initialized
+    /// the path information uninitialized value are not fully maintained on LLVM PHINode after mem2reg
+    a = b = 0;
+    if(k1){
+        a = &obj1;
+        s=&k1;
+    }
+    else{
+        b = &obj2;
+        s=&k2;
+    }
+
+    a->pi = s;
+    b->pi = s;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: obj1.pi,&k1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, obj1.pi may be assigned the address of &k1 through the pointer s, which is conditionally assigned to &k1.
+[QUESTION]
+Analyze whether pointer expression obj1.pi and pointer expression &k2 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+struct agg{
+    int*pi;
+    int k;
+}agg;
+
+int main(){
+    int *s,k1,k2;
+    struct agg *a,*b, obj1,obj2;
+    /// Note that, all pointers should be properly initialized
+    /// the path information uninitialized value are not fully maintained on LLVM PHINode after mem2reg
+    a = b = 0;
+    if(k1){
+        a = &obj1;
+        s=&k1;
+    }
+    else{
+        b = &obj2;
+        s=&k2;
+    }
+
+    a->pi = s;
+    b->pi = s;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: obj1.pi,&k2
+2. RESULT: MAY
+3. REASON: Depending on the execution path, obj1.pi may be assigned the address of either k1 or k2, leading to potential aliasing with &k2.
+[QUESTION]
+Analyze whether pointer expression obj2.pi and pointer expression &k2 alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+struct agg{
+    int*pi;
+    int k;
+}agg;
+
+int main(){
+    int *s,k1,k2;
+    struct agg *a,*b, obj1,obj2;
+    /// Note that, all pointers should be properly initialized
+    /// the path information uninitialized value are not fully maintained on LLVM PHINode after mem2reg
+    a = b = 0;
+    if(k1){
+        a = &obj1;
+        s=&k1;
+    }
+    else{
+        b = &obj2;
+        s=&k2;
+    }
+
+    a->pi = s;
+    b->pi = s;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: obj2.pi,&k2
+2. RESULT: MAY
+3. REASON: Depending on the execution path, both obj2.pi and &k2 could be assigned the same address through the pointer s, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression obj2.pi and pointer expression &k1 alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+struct agg{
+    int*pi;
+    int k;
+}agg;
+
+int main(){
+    int *s,k1,k2;
+    struct agg *a,*b, obj1,obj2;
+    /// Note that, all pointers should be properly initialized
+    /// the path information uninitialized value are not fully maintained on LLVM PHINode after mem2reg
+    a = b = 0;
+    if(k1){
+        a = &obj1;
+        s=&k1;
+    }
+    else{
+        b = &obj2;
+        s=&k2;
+    }
+
+    a->pi = s;
+    b->pi = s;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: obj2.pi,&k1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, both obj2.pi and &k1 may be assigned the same address through the pointer s.

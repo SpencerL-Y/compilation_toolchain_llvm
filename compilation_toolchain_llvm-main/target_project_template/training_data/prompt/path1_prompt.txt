@@ -1,0 +1,114 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &e alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+void foo(int**, int*);
+main(){
+	int **x, *y;
+	int  *c, *d,e,f;
+	if(x) { x =&c; y =&e;}
+	else { x= &d; y = &f;}
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+void foo(int **p, int *q){
+	*p = q;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,&e
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `c` may be assigned the address of `e` through the function `foo`, leading to potential aliasing.
+[QUESTION]
+Analyze whether pointer expression d and pointer expression &f alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+void foo(int**, int*);
+main(){
+	int **x, *y;
+	int  *c, *d,e,f;
+	if(x) { x =&c; y =&e;}
+	else { x= &d; y = &f;}
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+void foo(int **p, int *q){
+	*p = q;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: d,&f
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `d` and `&f` may be assigned to the same location through the function `foo`, which assigns `*p = q`, potentially making `d` point to `f`.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &f alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+void foo(int**, int*);
+main(){
+	int **x, *y;
+	int  *c, *d,e,f;
+	if(x) { x =&c; y =&e;}
+	else { x= &d; y = &f;}
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+void foo(int **p, int *q){
+	*p = q;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,&f
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `c` and `&f` may be assigned to the same location through the function `foo`, which assigns `*p = q`.
+[QUESTION]
+Analyze whether pointer expression d and pointer expression &e alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+void foo(int**, int*);
+main(){
+	int **x, *y;
+	int  *c, *d,e,f;
+	if(x) { x =&c; y =&e;}
+	else { x= &d; y = &f;}
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+}
+
+void foo(int **p, int *q){
+	*p = q;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: d,&e
+2. RESULT: NO
+3. REASON: The pointers d and &e are assigned in mutually exclusive branches of the if-else statement, ensuring they never point to the same memory location.

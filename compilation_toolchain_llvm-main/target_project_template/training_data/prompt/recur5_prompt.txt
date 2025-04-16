@@ -1,0 +1,122 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &r alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int* x, x1;
+void f(int **m){
+int **n,*y,*k,z,r;
+   n = &y;
+   y = &z;
+   if(z==1){
+	*n=&r;
+------- LABEL 1
+------- LABEL 2
+	k = *n;
+------- LABEL 3
+------- LABEL 4
+	f(n);
+   }
+}
+
+int main(){
+	x=&x1;
+	f(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,&r
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the address of z, and through the indirect assignment *n = &r, y may be updated to point to the same location as &r, depending on the execution path taken.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int* x, x1;
+void f(int **m){
+int **n,*y,*k,z,r;
+   n = &y;
+   y = &z;
+   if(z==1){
+	*n=&r;
+------- LABEL 1
+------- LABEL 2
+	k = *n;
+------- LABEL 3
+------- LABEL 4
+	f(n);
+   }
+}
+
+int main(){
+	x=&x1;
+	f(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,&z
+2. RESULT: NO
+3. REASON: Pointer y is assigned the address of z, but y and &z are distinct because y holds the address of z, while &z is the address itself. They never point to the same memory location.
+[QUESTION]
+Analyze whether pointer expression k and pointer expression &r alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int* x, x1;
+void f(int **m){
+int **n,*y,*k,z,r;
+   n = &y;
+   y = &z;
+   if(z==1){
+	*n=&r;
+------- LABEL 1
+------- LABEL 2
+	k = *n;
+------- LABEL 3
+------- LABEL 4
+	f(n);
+   }
+}
+
+int main(){
+	x=&x1;
+	f(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: k,&r
+2. RESULT: MAY
+3. REASON: The pointer `k` is assigned the value of `*n`, which may point to `&r` if the condition `z==1` is true, creating a potential alias between `k` and `&r`.
+[QUESTION]
+Analyze whether pointer expression k and pointer expression &z alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int* x, x1;
+void f(int **m){
+int **n,*y,*k,z,r;
+   n = &y;
+   y = &z;
+   if(z==1){
+	*n=&r;
+------- LABEL 1
+------- LABEL 2
+	k = *n;
+------- LABEL 3
+------- LABEL 4
+	f(n);
+   }
+}
+
+int main(){
+	x=&x1;
+	f(x);
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: k,&z
+2. RESULT: MAY
+3. REASON: The pointer `k` is assigned the value of `*n`, which is set to point to `&z` or `&r` depending on the condition `z==1`. Since `z` is a runtime value and can be either true or false, `k` may point to `&z` in some execution paths.

@@ -1,0 +1,3 @@
+LABEL 1,b,&obj,MUST
+LABEL 2,e,d,MAY
+LABEL 3,e,&obj,MAY

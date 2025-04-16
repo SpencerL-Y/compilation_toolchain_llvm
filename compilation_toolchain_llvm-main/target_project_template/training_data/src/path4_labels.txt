@@ -1,0 +1,5 @@
+LABEL 1,p,&a,MAY
+LABEL 2,p,&x1,MAY
+LABEL 3,m,&a1,NO
+LABEL 4,m,&x1,NO
+LABEL 5,n,m,MUST

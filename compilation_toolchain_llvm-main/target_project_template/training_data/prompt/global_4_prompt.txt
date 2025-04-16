@@ -1,0 +1,70 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression w alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int g;
+int* obj = &g; 
+void Zulu(int**p, int *q);
+
+void Xray(){
+
+	int **x,*b,*w,d;
+	x = &b; 
+	w = &d; 
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+
+void Zulu(int**p,int *q){
+	*p = q;
+	*p = obj;
+}
+
+int main(){
+	Xray();
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,w
+2. RESULT: MAY
+3. REASON: The function `Zulu` assigns `*p` to `q` and then to `obj`, which means `b` (pointed by `*p`) could potentially point to the same location as `w` (pointed by `q`) or `obj`, leading to a possible aliasing scenario.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &g alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int g;
+int* obj = &g; 
+void Zulu(int**p, int *q);
+
+void Xray(){
+
+	int **x,*b,*w,d;
+	x = &b; 
+	w = &d; 
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+
+void Zulu(int**p,int *q){
+	*p = q;
+	*p = obj;
+}
+
+int main(){
+	Xray();
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&g
+2. RESULT: MAY
+3. REASON: The pointer `b` is assigned the value of `*p` in function `Zulu`, and `*p` is set to point to `obj`, which is initialized to the address of `g`. Therefore, `b` may point to the same location as `&g` after the execution of `Zulu`.

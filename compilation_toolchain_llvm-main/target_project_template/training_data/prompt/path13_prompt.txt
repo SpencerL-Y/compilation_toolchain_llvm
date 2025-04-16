@@ -1,0 +1,146 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &f alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+struct agg{
+	int **i;
+}agg;
+
+int main(){
+	int *b,*c,*d,f,w;
+	struct agg ag1, *a;
+	a = &ag1;
+
+	if(a){
+        if(f){
+		    a->i = &c;
+		    b = &f;
+        }
+	}
+	else{
+		a->i = &d;
+		b = &w;
+	}
+	*(a->i) = b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,&f
+2. RESULT: NO
+3. REASON: The pointer `c` is assigned to `a->i` only if `f` is true, while `&f` is assigned to `b` in the same condition. Since `b` is then assigned to `*(a->i)`, `c` and `&f` never point to the same location.
+[QUESTION]
+Analyze whether pointer expression d and pointer expression &w alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+struct agg{
+	int **i;
+}agg;
+
+int main(){
+	int *b,*c,*d,f,w;
+	struct agg ag1, *a;
+	a = &ag1;
+
+	if(a){
+        if(f){
+		    a->i = &c;
+		    b = &f;
+        }
+	}
+	else{
+		a->i = &d;
+		b = &w;
+	}
+	*(a->i) = b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: d,&w
+2. RESULT: NO
+3. REASON: The pointers d and &w are assigned to different memory locations in mutually exclusive branches of the conditional statement, ensuring they never point to the same location.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression &w alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+
+struct agg{
+	int **i;
+}agg;
+
+int main(){
+	int *b,*c,*d,f,w;
+	struct agg ag1, *a;
+	a = &ag1;
+
+	if(a){
+        if(f){
+		    a->i = &c;
+		    b = &f;
+        }
+	}
+	else{
+		a->i = &d;
+		b = &w;
+	}
+	*(a->i) = b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: c,&w
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `c` and `&w` may be assigned to the same location through indirect assignments via `a->i`.
+[QUESTION]
+Analyze whether pointer expression d and pointer expression &f alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+
+struct agg{
+	int **i;
+}agg;
+
+int main(){
+	int *b,*c,*d,f,w;
+	struct agg ag1, *a;
+	a = &ag1;
+
+	if(a){
+        if(f){
+		    a->i = &c;
+		    b = &f;
+        }
+	}
+	else{
+		a->i = &d;
+		b = &w;
+	}
+	*(a->i) = b;
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: d,&f
+2. RESULT: NO
+3. REASON: The pointer `d` is assigned to `a->i` only in the `else` branch, while `&f` is assigned to `a->i` in the `if` branch, ensuring they never point to the same location.

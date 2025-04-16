@@ -1,0 +1,56 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression v and pointer expression &q1 alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+
+int main(){
+    int **p, *q, **w,*v, *a,a1,q1;
+    a = &a1;
+    p = &a;
+    q = &q1;
+    w = 0;
+    if(p)
+        *p = q;
+    else
+        w = &a;
+
+    v = *w;
+------- LABEL 1
+------- LABEL 2
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: v,&q1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, v may be assigned the value of q through the indirect assignment *p = q, which could make v point to the same location as &q1.
+[QUESTION]
+Analyze whether pointer expression v and pointer expression &a1 alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+
+int main(){
+    int **p, *q, **w,*v, *a,a1,q1;
+    a = &a1;
+    p = &a;
+    q = &q1;
+    w = 0;
+    if(p)
+        *p = q;
+    else
+        w = &a;
+
+    v = *w;
+------- LABEL 1
+------- LABEL 2
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: v,&a1
+2. RESULT: MAY
+3. REASON: Depending on the execution path, `v` may be assigned the address of `a1` through `w` if the `else` branch is taken, leading to a potential aliasing situation.

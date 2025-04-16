@@ -1,0 +1,5 @@
+LABEL 1,x,&obj1,MAY
+LABEL 2,z,&obj1,MAY
+LABEL 3,y,&obj2,MAY
+LABEL 4,z,&obj2,MAY
+LABEL 5,x,&obj2,NO

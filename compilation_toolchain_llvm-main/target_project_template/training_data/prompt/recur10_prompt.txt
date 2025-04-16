@@ -1,0 +1,95 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &y alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int **p,*x, y, z;
+
+void f() {
+  p = &x;
+  if (z) {
+    *p = &y;
+------- LABEL 1
+    f();
+    *p = &z;
+------- LABEL 2
+------- LABEL 3
+    f();
+  }
+}
+
+
+int main()
+{
+    f();
+    return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: x,&y
+2. RESULT: MAY
+3. REASON: The pointer `p` can be assigned the address of `x`, and subsequently, `*p` can be assigned the address of `y`, making `x` and `&y` potentially point to the same location through indirect assignment.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int **p,*x, y, z;
+
+void f() {
+  p = &x;
+  if (z) {
+    *p = &y;
+------- LABEL 1
+    f();
+    *p = &z;
+------- LABEL 2
+------- LABEL 3
+    f();
+  }
+}
+
+
+int main()
+{
+    f();
+    return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: x,&z
+2. RESULT: MAY
+3. REASON: Due to the recursive function `f`, `*p` can be assigned the address of either `y` or `z`, and since `p` initially points to `x`, `x` may end up pointing to `z` through indirect assignments.
+[QUESTION]
+Analyze whether pointer expression x and pointer expression &y alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int **p,*x, y, z;
+
+void f() {
+  p = &x;
+  if (z) {
+    *p = &y;
+------- LABEL 1
+    f();
+    *p = &z;
+------- LABEL 2
+------- LABEL 3
+    f();
+  }
+}
+
+
+int main()
+{
+    f();
+    return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: x,&y
+2. RESULT: MAY
+3. REASON: In the function `f`, the pointer `*p` is conditionally assigned the address of `y`, and since `p` points to `x`, `x` may point to `y` depending on the execution path.

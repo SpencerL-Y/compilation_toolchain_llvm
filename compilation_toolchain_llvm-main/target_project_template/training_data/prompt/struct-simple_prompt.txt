@@ -1,0 +1,32 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression s2.a and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+/*
+ * Alias due to struct assignment
+ * Author: Sen Ye
+ * Date: 06/09/2013
+ */
+#include "aliascheck.h"
+
+struct s{
+	int *a;
+	int b;
+};
+
+int main()
+{
+	struct s s1, s2;
+	int x, y;
+	s1.a = &x;
+	s2.a = s1.a;
+------- LABEL 1
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: s2.a,&x
+2. RESULT: MUST
+3. REASON: After the direct assignment `s2.a = s1.a`, and since `s1.a` was assigned the address of `x`, both `s2.a` and `&x` must point to the same memory location.

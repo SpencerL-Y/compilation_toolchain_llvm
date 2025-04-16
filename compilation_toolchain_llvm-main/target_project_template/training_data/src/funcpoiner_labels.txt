@@ -1,0 +1,4 @@
+LABEL 1,y,m,MUST
+LABEL 2,y,n,NO
+LABEL 3,z,n,MUST
+LABEL 4,z,m,NO

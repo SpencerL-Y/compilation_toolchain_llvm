@@ -1,0 +1,150 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression &p->f3[10] and pointer expression q alias in the following program at the position with "------- LABEL 1":
+/*
+ * Struct with array.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	int f3[100];
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &p->f3[10],q
+2. RESULT: MAY
+3. REASON: Array elements with different indices may alias due to unknown runtime indices, and q points to an element of the same array field.
+[QUESTION]
+Analyze whether pointer expression &p->f3[20] and pointer expression &p->f3[30] alias in the following program at the position with "------- LABEL 2":
+/*
+ * Struct with array.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	int f3[100];
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &p->f3[20],&p->f3[30]
+2. RESULT: MAY
+3. REASON: Array elements with different indices may alias due to unknown runtime index values.
+[QUESTION]
+Analyze whether pointer expression &s.f3[0] and pointer expression &s.f3[99] alias in the following program at the position with "------- LABEL 3":
+/*
+ * Struct with array.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	int f3[100];
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: &s.f3[0],&s.f3[99]
+2. RESULT: MAY
+3. REASON: Array elements with different indices may alias due to dynamic index access at runtime, requiring conservative analysis.
+[QUESTION]
+Analyze whether pointer expression &p->f3[0] and pointer expression &s.f4 alias in the following program at the position with "------- LABEL 4":
+/*
+ * Struct with array.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	int f3[100];
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+	
+	return 0;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: &p->f3[0],&s.f4
+2. RESULT: NO
+3. REASON: Different struct fields never alias due to field sensitivity.

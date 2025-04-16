@@ -1,0 +1,346 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression a and pointer expression b alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,b
+2. RESULT: MAY
+3. REASON: Due to the indirect assignment in `foo`, `a` and `b` may point to the same location depending on the execution path and assignments.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &obj alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&obj
+2. RESULT: MAY
+3. REASON: The function `foo` assigns `*p = *q` and then `*q = &obj`. Depending on the execution path, `b` may be assigned the value of `*p`, which could have been set to `&obj` through `*q`. Thus, `b` may alias with `&obj`.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression c alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,c
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment and potential reassignment of `c` to `a`, `a` and `c` may point to the same memory location depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression d alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, c and d may both be assigned the address of the same variable, t, making them potentially alias.
+[QUESTION]
+Analyze whether pointer expression d and pointer expression &obj alias in the following program at the position with "------- LABEL 5":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: d,&obj
+2. RESULT: MAY
+3. REASON: The pointer `d` is assigned the address of `t` or `s` through `foo`, and `&obj` is directly assigned to `*q` in `foo`. Since `d` could potentially be assigned the address of `obj` through indirect assignments in `foo`, they may alias.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression c alias in the following program at the position with "------- LABEL 6":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: a,c
+2. RESULT: MAY
+3. REASON: Due to the conditional assignment and potential reassignment of `c` to `a`, `a` and `c` may point to the same memory location depending on the execution path taken.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression d alias in the following program at the position with "------- LABEL 7":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,d
+2. RESULT: MAY
+3. REASON: Due to the conditional execution paths and assignments in the program, `a` and `d` may point to the same memory location if the `else` branch is taken, where both `x` and `y` are assigned the address of `d`, and `foo` is called, potentially making `a` and `d` alias through the indirect assignment in `foo`.
+[QUESTION]
+Analyze whether pointer expression c and pointer expression d alias in the following program at the position with "------- LABEL 8":
+#include "aliascheck.h"
+int obj, t,s;
+int *k =&s;
+void foo(int**, int**);
+main(){
+	int **x, **y;
+	int *a, *b, *c, *d,*e;
+    a = &t;
+	x=&a; y =&b; 
+	foo(x,y);
+------- LABEL 1
+------- LABEL 2
+	*b = 5;
+	c=&t;
+	c=&s;
+	a=c;
+------- LABEL 3
+	if(t) {c=&obj; x =&c; y =&e;}
+	else { x= &d; y = &d;}
+	e = &t;
+	foo(x,y);
+------- LABEL 4
+------- LABEL 5
+------- LABEL 6
+------- LABEL 7
+------- LABEL 8
+	*e = 10;
+	
+}
+
+void foo(int **p, int **q){
+	*p = *q;
+	*q = &obj;
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MAY alias
+LLM Analysis:
+1. POINTERS: c,d
+2. RESULT: MAY
+3. REASON: Depending on the execution path, both `c` and `d` can be assigned the address of `t`, leading to potential aliasing.

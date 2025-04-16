@@ -1,0 +1,174 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &d alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int *obj;
+int **x,*b,*w,d;
+int **z, *a,*y,c;
+void Zulu(int**p, int *q);
+ 
+void Xray(){
+	x = &b;
+	w = &d;
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+void Yank(){
+	z = &a;
+	y = &c;
+	Zulu(z,y);
+------- LABEL 3
+------- LABEL 4
+}
+
+void Zulu(int**p,int *q){
+	*q = 100;
+	*p = q;
+
+}
+
+void main(){
+
+	Xray();
+	Yank();
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: b,&d
+2. RESULT: MAY
+3. REASON: The function `Zulu` assigns the value of `q` to the location pointed by `p`, which means `b` and `&d` could potentially point to the same address after the function call, depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression b and pointer expression &c alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int *obj;
+int **x,*b,*w,d;
+int **z, *a,*y,c;
+void Zulu(int**p, int *q);
+ 
+void Xray(){
+	x = &b;
+	w = &d;
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+void Yank(){
+	z = &a;
+	y = &c;
+	Zulu(z,y);
+------- LABEL 3
+------- LABEL 4
+}
+
+void Zulu(int**p,int *q){
+	*q = 100;
+	*p = q;
+
+}
+
+void main(){
+
+	Xray();
+	Yank();
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: b,&c
+2. RESULT: MAY
+3. REASON: The function `Zulu` assigns the value of `q` to the location pointed by `p`, which means `b` and `&c` could potentially point to the same address after the function calls in `Xray` and `Yank`, respectively.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &c alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int *obj;
+int **x,*b,*w,d;
+int **z, *a,*y,c;
+void Zulu(int**p, int *q);
+ 
+void Xray(){
+	x = &b;
+	w = &d;
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+void Yank(){
+	z = &a;
+	y = &c;
+	Zulu(z,y);
+------- LABEL 3
+------- LABEL 4
+}
+
+void Zulu(int**p,int *q){
+	*q = 100;
+	*p = q;
+
+}
+
+void main(){
+
+	Xray();
+	Yank();
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: a,&c
+2. RESULT: MAY
+3. REASON: The function Zulu assigns the value of q to the location pointed by p, and since both Xray and Yank call Zulu with different arguments, a and &c could potentially point to the same location depending on the execution path.
+[QUESTION]
+Analyze whether pointer expression a and pointer expression &d alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int *obj;
+int **x,*b,*w,d;
+int **z, *a,*y,c;
+void Zulu(int**p, int *q);
+ 
+void Xray(){
+	x = &b;
+	w = &d;
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+void Yank(){
+	z = &a;
+	y = &c;
+	Zulu(z,y);
+------- LABEL 3
+------- LABEL 4
+}
+
+void Zulu(int**p,int *q){
+	*q = 100;
+	*p = q;
+
+}
+
+void main(){
+
+	Xray();
+	Yank();
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: a,&d
+2. RESULT: MAY
+3. REASON: The function Zulu assigns the address of `q` to the location pointed by `p`, and since `Zulu` is called with `x` and `w` in `Xray` and with `z` and `y` in `Yank`, `a` and `&d` may point to the same location after these calls.

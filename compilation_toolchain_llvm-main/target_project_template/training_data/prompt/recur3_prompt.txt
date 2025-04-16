@@ -1,0 +1,142 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &x alias in the following program at the position with "------- LABEL 1":
+#include "aliascheck.h"
+int x, *y, z;
+void f(int **m);
+void main(){
+
+	int **a = &y;
+
+	f(a);
+
+
+}
+
+void f(int **m){
+	if(x){
+		*m = &x;
+------- LABEL 1
+------- LABEL 2
+		f(m);
+	}
+	else{
+		*m = &z;
+------- LABEL 3
+------- LABEL 4
+	}
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,&x
+2. RESULT: MAY
+3. REASON: Depending on the execution path, y may be assigned the address of x through the pointer m in function f, leading to a potential aliasing situation.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &z alias in the following program at the position with "------- LABEL 2":
+#include "aliascheck.h"
+int x, *y, z;
+void f(int **m);
+void main(){
+
+	int **a = &y;
+
+	f(a);
+
+
+}
+
+void f(int **m){
+	if(x){
+		*m = &x;
+------- LABEL 1
+------- LABEL 2
+		f(m);
+	}
+	else{
+		*m = &z;
+------- LABEL 3
+------- LABEL 4
+	}
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,&z
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the address of either x or z depending on the execution path in function f, making it possible for y to point to the same location as &z.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &z alias in the following program at the position with "------- LABEL 3":
+#include "aliascheck.h"
+int x, *y, z;
+void f(int **m);
+void main(){
+
+	int **a = &y;
+
+	f(a);
+
+
+}
+
+void f(int **m){
+	if(x){
+		*m = &x;
+------- LABEL 1
+------- LABEL 2
+		f(m);
+	}
+	else{
+		*m = &z;
+------- LABEL 3
+------- LABEL 4
+	}
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions MUST alias
+LLM Analysis:
+1. POINTERS: y,&z
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the address of either x or z depending on the execution path, so it may point to the same location as &z.
+[QUESTION]
+Analyze whether pointer expression y and pointer expression &x alias in the following program at the position with "------- LABEL 4":
+#include "aliascheck.h"
+int x, *y, z;
+void f(int **m);
+void main(){
+
+	int **a = &y;
+
+	f(a);
+
+
+}
+
+void f(int **m){
+	if(x){
+		*m = &x;
+------- LABEL 1
+------- LABEL 2
+		f(m);
+	}
+	else{
+		*m = &z;
+------- LABEL 3
+------- LABEL 4
+	}
+
+}
+
+[ANSWER]
+Ground Truth: The two pointer expressions NO alias
+LLM Analysis:
+1. POINTERS: y,&x
+2. RESULT: MAY
+3. REASON: The pointer y is assigned the address of either x or z depending on the execution path, making it possible for y to point to the same location as &x.
