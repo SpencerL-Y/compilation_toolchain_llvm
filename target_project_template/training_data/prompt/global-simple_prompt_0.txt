@@ -1,0 +1,26 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression *qq_int and pointer expression q_int alias in the following program at the position with "------- LABEL 1 ":
+/*
+ * Global variables test.
+ * Author: Sen Ye
+ * Date: 03/05/2014
+ */
+#include "aliascheck.h"
+
+int a_int = 10;
+int* p_int = &a_int;
+int** pp_int = &p_int;
+
+int main() {
+	int b_int = a_int;
+	int* q_int = p_int;
+	int** qq_int = pp_int;
+------- LABEL 1
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MUST alias

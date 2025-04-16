@@ -1,0 +1,32 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression b and pointer expression w alias in the following program at the position with "------- LABEL 1 ":
+#include "aliascheck.h"
+int g;
+int* obj = &g; 
+void Zulu(int**p, int *q);
+
+void Xray(){
+
+	int **x,*b,*w,d;
+	x = &b; 
+	w = &d; 
+	Zulu(x,w);
+------- LABEL 1
+------- LABEL 2
+}
+
+
+void Zulu(int**p,int *q){
+	*p = q;
+	*p = obj;
+}
+
+int main(){
+	Xray();
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MUST NOT alias

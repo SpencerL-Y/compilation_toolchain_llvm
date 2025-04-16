@@ -1,0 +1,25 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression p alias in the following program at the position with "------- LABEL 1 ":
+#include "aliascheck.h"
+int* foo(int* x){
+   return x;
+}
+
+int main(){
+
+  int *x,*y,*p,*q,a,b;
+  p = &a;
+  q = &b;
+  x = foo(p);
+  y = foo(q);
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+------- LABEL 4
+
+}
+
+[ANSWER]
+The two pointer expression MUST alias

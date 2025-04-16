@@ -1,0 +1,35 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression x and pointer expression y alias in the following program at the position with "------- LABEL 2 ":
+/*
+ * Function pointer.
+ * Author: Sen Ye
+ * Date: 10/10/2013
+ */
+#include "aliascheck.h"
+
+
+void func1(int **p, int **q) {
+	*p = *q;
+------- LABEL 1
+}
+
+void (*fp)(int**,int**);
+
+int main() {
+	int o1, o2;
+	int *x, *y;
+	int **m, **n;
+	x = &o1;
+	y = &o2;
+	m = &x;
+	n = &x;
+	fp = func1;
+	fp(m,n);
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MUST NOT alias

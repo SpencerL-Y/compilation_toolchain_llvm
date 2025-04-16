@@ -1,0 +1,38 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression &p->f3.f1[0] and pointer expression &s.f4 alias in the following program at the position with "------- LABEL 3 ":
+/*
+ * Struct with array of structs.
+ * Author: Sen Ye
+ * Date: 28/04/2014
+ */
+#include "aliascheck.h"
+
+struct InnerArrayStruct {
+	int f1[100];
+};
+
+struct ArrayStruct {
+	int f1;
+	char f2;
+	struct InnerArrayStruct f3;
+	int f4;
+};
+
+int main() {
+	struct ArrayStruct* p;
+	struct ArrayStruct s;
+	int* q;
+
+	p = &s;
+	q = &s.f3.f1[40];
+------- LABEL 1
+------- LABEL 2
+------- LABEL 3
+	
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MUST NOT alias

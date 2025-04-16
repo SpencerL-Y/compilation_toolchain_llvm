@@ -1,0 +1,15 @@
+[ROLE]
+Pointer analyzer that analyzes whether two pointer in a program alias
+[QUESTION]
+Analyze whether pointer expression void* and pointer expression void* alias in the following program at the position with "------- LABEL 1 ":
+------- LABEL 1
+int main() {
+	int a, b;
+	int* source[2] = {&a, &b};
+	int* x = source[1];
+------- LABEL 2
+	return 0;
+}
+
+[ANSWER]
+The two pointer expression MAY alias
