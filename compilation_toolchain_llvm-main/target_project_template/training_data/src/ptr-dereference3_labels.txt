@@ -1,2 +1,0 @@
-LABEL 1,s,&z,MUST
-LABEL 2,x,r,MUST

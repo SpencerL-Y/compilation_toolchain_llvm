@@ -1,1 +1,0 @@
-LABEL 1,sentence[0].string,c1,NO

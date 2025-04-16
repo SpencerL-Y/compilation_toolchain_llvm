@@ -1,3 +1,0 @@
-LABEL 1,n,&y,MUST
-LABEL 2,n,&z,NO
-LABEL 3,z,&z1,NO

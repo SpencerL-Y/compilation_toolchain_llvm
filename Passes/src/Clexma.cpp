@@ -9,6 +9,10 @@
 #include "llvm/IR/DebugProgramInstruction.h"
 #include "llvm/Support/Debug.h"     
 #include "llvm/BinaryFormat/Dwarf.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassPlugin.h" 
+#include "llvm/Passes/PassBuilder.h" 
+
 
 
 using namespace llvm;
@@ -116,9 +120,9 @@ void ClexmaPass::createMallocMemlogStab(CallInst*    CI,
                 }
             
                 Value* malloc_result_arg = CI;
-                Value* filename_arg = builder.CreateGlobalStringPtr(file_name);
+                Value* filename_arg = builder.CreateGlobalString(file_name);
                 Value* line_arg = ConstantInt::get(Type::getInt32Ty(F.getContext()), line_num);
-                Value* var_arg = builder.CreateGlobalStringPtr(var_name);
+                Value* var_arg = builder.CreateGlobalString(var_name);
             
                 std::vector<Value*> args;
                 args.push_back(malloc_result_arg);
@@ -153,9 +157,9 @@ void ClexmaPass::createStorelogStab(StoreInst*        SI,
                 }
 
                 Value* stored_ptr_arg = SI->getPointerOperand();
-                Value* file_name_arg = builder.CreateGlobalStringPtr(file_name);
+                Value* file_name_arg = builder.CreateGlobalString(file_name);
                 Value* line_arg = ConstantInt::get(Type::getInt32Ty(F.getContext()), line_num);
-                Value* var_arg = builder.CreateGlobalStringPtr(var_name);
+                Value* var_arg = builder.CreateGlobalString(var_name);
 
                 std::vector<Value*> args;
                 args.push_back(stored_ptr_arg);
@@ -196,8 +200,8 @@ void ClexmaPass::createAllocalogStab(AllocaInst*        AI,
                 if(!log_alloca_func) {
                     errs() << "ERROR: alloca logging function not found\n";
                 }
-                Value* var_arg = builder.CreateGlobalStringPtr(var_name);
-                Value* file_name_arg = builder.CreateGlobalStringPtr(file_name);
+                Value* var_arg = builder.CreateGlobalString(var_name);
+                Value* file_name_arg = builder.CreateGlobalString(file_name);
                 Value* line_arg = ConstantInt::get(Type::getInt32Ty(F.getContext()), line_num);
             
                 std::vector<Value*> args;
@@ -245,8 +249,8 @@ void ClexmaPass::createFreeMemlogStabs(CallInst* CI,
                 if(!log_before_free_func) {
                     errs() << "ERROR: cannot find clexma_log_before_free_result function\n";
                 }
-                Value* filename_arg_before = before_builder.CreateGlobalStringPtr(file_name);
-                Value* variable_name_arg_before = before_builder.CreateGlobalStringPtr(var_name);
+                Value* filename_arg_before = before_builder.CreateGlobalString(file_name);
+                Value* variable_name_arg_before = before_builder.CreateGlobalString(var_name);
                 std::vector<Value*> before_args;
                 before_args.push_back(freed_ptr_arg);
                 before_args.push_back(filename_arg_before);
@@ -261,8 +265,8 @@ void ClexmaPass::createFreeMemlogStabs(CallInst* CI,
                 if(!log_after_free_func) {
                     errs() << "ERROR: cannot find clexma_log_after_free_result function" << "\n";
                 }
-                Value *filename_arg_after = after_builder.CreateGlobalStringPtr(file_name);
-                Value *varible_name_arg_after = after_builder.CreateGlobalStringPtr(var_name);
+                Value *filename_arg_after = after_builder.CreateGlobalString(file_name);
+                Value *varible_name_arg_after = after_builder.CreateGlobalString(var_name);
             
                 std::vector<Value*> after_args;
                 after_args.push_back(freed_ptr_arg);
@@ -328,4 +332,3 @@ PreservedAnalyses ClexmaPass::run(Function& F,
     }
     return PreservedAnalyses::all();
 }
-

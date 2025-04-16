@@ -1,2 +1,0 @@
-LABEL 1,*pp,*qq,NO
-LABEL 2,*pp,*qq,MUST

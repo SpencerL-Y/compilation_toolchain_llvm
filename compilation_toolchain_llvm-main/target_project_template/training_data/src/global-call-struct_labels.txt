@@ -1,2 +1,0 @@
-LABEL 1,p,q,MAY
-LABEL 2,global.f2,*qq,MAY

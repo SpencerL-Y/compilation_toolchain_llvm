@@ -1,2 +1,0 @@
-LABEL 1,pms2->f4,pms1->f2.f3,NO
-LABEL 2,pms2->f3,pms1->f2.f3,MUST

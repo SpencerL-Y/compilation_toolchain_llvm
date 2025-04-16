@@ -1,2 +1,0 @@
-LABEL 1,c,&obj,NO
-LABEL 2,d,&t,NO

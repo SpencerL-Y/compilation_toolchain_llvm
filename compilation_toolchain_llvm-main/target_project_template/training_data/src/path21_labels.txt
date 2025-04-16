@@ -1,3 +1,0 @@
-LABEL 1,r,q,MUST
-LABEL 2,r,&z,NO
-LABEL 3,r,&f1,NO
