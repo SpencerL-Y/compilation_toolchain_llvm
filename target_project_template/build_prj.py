@@ -39,6 +39,8 @@ def compile_to_ll(source_file):
     subprocess.run(clang_command, check=True)
     return ll_file
 
+
+
 # 运行 LLVM Pass
 def run_main_pass(input_bc_file_path, main_pass_path):
     output_bc_file_path = input_bc_file_path.replace(".bc", "_passed.bc")
@@ -52,7 +54,7 @@ def run_main_pass(input_bc_file_path, main_pass_path):
     return output_bc_file_path
 
 def link_single_to_logged_bc(ll_file, logging_ll):
-    output_logged_bc_path = os.path.splitext(ll_file)[0] + "_logged.bc"
+    output_logged_bc_path = os.path.splitext(ll_file)[0] + "_Celxmalogged.bc"
     link_command = ["llvm-link", ll_file, logging_ll, "-o", output_logged_bc_path]
     print(f"Running command: {' '.join(link_command)}")
     subprocess.run(link_command, check=True)
@@ -69,7 +71,6 @@ def compile_linked_bc_to_binary(merged_bc_file_path, main_pass_path, output_fold
     print(f"Running command: {' '.join(clang_command)}" )
     subprocess.run(clang_command, check=True)
     return output_bin_path
-    
 
 def build_ll_and_link():
     print("Building ll files... ")
@@ -111,14 +112,42 @@ def is_clexma_logging_file(file_name):
     else:
         return False
     
+def instrument_bc_and_compile_shared_lib(input_bc_file_path, main_pass_path, logging_ll):
+    passed_single_file_path = run_main_pass(input_bc_file_path, main_pass_path)
+    output_log_bc_path = link_single_to_logged_bc(passed_single_file_path, logging_ll)
+    output_object_path = os.path.splitext(output_log_bc_path)[0] + ".o"
+    output_so_path = os.path.splitext(output_log_bc_path)[0] + ".so"
+    llc_command = ["llc", "-filetype=obj", output_log_bc_path, "-o", output_object_path]
+    clang_command = ["clang", "-shared", output_object_path, '-o', output_so_path]
+    print("Compiling linked bc to binary")
+    print(f"Running command: {' '.join(llc_command)}" )
+    subprocess.run(llc_command, check=True)
+    print(f"Running command: {' '.join(clang_command)}" )
+    subprocess.run(clang_command, check=True)
+    print("output so file: " + output_so_path)
+    return output_so_path
+
+
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Argument insufficient\n Usage: python3 build_prj.py [main pass path] [output folder]")
-    
-    main_pass_path = sys.argv[1]
-    output_folder = sys.argv[2]
-    print("main pass path: " + sys.argv[1])
-    print("output folder: " + sys.argv[2])
-    # build_ll_and_link()
-    build_ll_link_and_compile(main_pass_path, output_folder)
+    if(len(sys.argv) == 1):
+        print("Argument insufficient\n Usage: python3 build_prj.py [mode]")
+        print("[mode] can be \"single\", \"shared\"")
+    mode_str = sys.argv[1]
+    if mode_str == "single":
+        if len(sys.argv) != 4:
+            print("Argument insufficient\n Usage: python3 build_prj.py single [main pass path] [output folder]")
+        main_pass_path = sys.argv[2]
+        output_folder = sys.argv[3]
+        print("main pass path: " + sys.argv[2])
+        print("output folder: " + sys.argv[3])
+        # build_ll_and_link()
+        build_ll_link_and_compile(main_pass_path, output_folder)
+    elif mode_str == "shared":
+        main_pass_path = sys.argv[2]
+        shared_bc_file = sys.argv[3]
+        logging_ll_path = sys.argv[4]
+        instrument_bc_and_compile_shared_lib(shared_bc_file, main_pass_path, logging_ll_path)
+    else:
+        pass
